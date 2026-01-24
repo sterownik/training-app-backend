@@ -8,6 +8,8 @@ public class TrainingApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TrainingApplication.class, args);
+		System.out.println("DB URL: " + System.getenv("PROD_DB_URL"));
+		System.out.println("DB USER: " + System.getenv("PROD_DB_USERNAME"));
 	}
 
 }

@@ -36,7 +36,7 @@ public class StravaAuthController {
                 "https://www.strava.com/oauth/authorize" +
                         "?client_id=191684" +
                         "&response_type=code" +
-                        "&redirect_uri=http://localhost:8080/auth/strava/callback" +
+                        "&redirect_uri=https://training-app-backend-production-4d0d.up.railway.app/auth/strava/callback" +
                         "&scope=activity:read_all";
 
         response.sendRedirect(url);

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: training-backend
+    env: java
+    plan: free
+    rootDir: training app maven/training
+    buildCommand: ./mvnw clean package -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: 21
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod

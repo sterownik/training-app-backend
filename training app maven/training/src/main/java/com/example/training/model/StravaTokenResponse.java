@@ -47,6 +47,7 @@ public class StravaTokenResponse {
         private Long id;
         private String firstname;
         private String lastname;
+        private String profile_medium;
 
         public Long getId() {
             return id;
@@ -70,6 +71,14 @@ public class StravaTokenResponse {
 
         public void setLastname(String lastname) {
             this.lastname = lastname;
+        }
+
+        public String getProfile_medium() {
+            return profile_medium;
+        }
+
+        public void setProfile_medium(String profile_medium) {
+            this.profile_medium = profile_medium;
         }
     }
 }

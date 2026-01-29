@@ -30,6 +30,9 @@ public class User {
     @Column(length = 2000)
     private String stravaRefreshToken;
 
+    @Column(length = 2000)
+    private String avatarUrl;
+
     private Instant stravaTokenExpiresAt;
 
     public Long getId() {
@@ -86,5 +89,13 @@ public class User {
 
     public void setStravaTokenExpiresAt(Instant stravaTokenExpiresAt) {
         this.stravaTokenExpiresAt = stravaTokenExpiresAt;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

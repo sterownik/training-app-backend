@@ -63,6 +63,7 @@ public class StravaAuthController {
         user.setStravaTokenExpiresAt(
                 Instant.ofEpochSecond(token.getExpires_at())
         );
+        user.setAvatarUrl(token.getAthlete().getProfile_medium());
 
         userRepository.save(user);
 

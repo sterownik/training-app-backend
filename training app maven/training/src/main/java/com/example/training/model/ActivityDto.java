@@ -25,7 +25,7 @@ public record ActivityDto(
             pace = paceFromDistanceAndMovingTime(a.getDistance(), a.getMoving_time());
         }
         String movingTime;
-        int hours = (int) (a.getMoving_time() % 3600);
+        int hours = (int) (a.getMoving_time() / 3600);
         int minutes = (int) (a.getMoving_time() / 60);
         int seconds = (int) Math.round(a.getMoving_time() % 60);
         if(hours > 0) {

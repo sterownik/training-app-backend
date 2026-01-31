@@ -50,6 +50,12 @@ public class Activity
      private String startCity;
 
      @Column(length = 2000)
+     private String descriptionTyped;
+
+     @Column(length = 2000)
+     private String photoUrl;
+
+     @Column(length = 2000)
      private Double averageWatts;
 
      @Column(length = 2000)
@@ -223,5 +229,21 @@ public class Activity
 
      public void setDescription(String description) {
          this.description = description;
+     }
+
+     public String getDescriptionTyped() {
+         return descriptionTyped;
+     }
+
+     public void setDescriptionTyped(String descriptionTyped) {
+         this.descriptionTyped = descriptionTyped;
+     }
+
+     public String getPhotoUrl() {
+         return photoUrl;
+     }
+
+     public void setPhotoUrl(String photoUrl) {
+         this.photoUrl = photoUrl;
      }
  }

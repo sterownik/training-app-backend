@@ -43,7 +43,7 @@ public class StravaTrainingController {
     public List<ActivityDto> callback(
             Authentication auth,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy
     ) throws IOException {
         User user = (User) auth.getPrincipal();

@@ -114,6 +114,8 @@ public class StravaActivityService {
                 activityDto.setMaxSpeed(maxSpeed);
                 activityDto.setStravaActivityId(a.getId());
                 activityDto.setStartDateLocal(a.getStartDateLocal());
+                activityDto.setPhotoUrl(a.getPhotos().getPrimary().getUrls().get("600"));
+                activityDto.setDescriptionTyped(a.getDescription());
 
 
 

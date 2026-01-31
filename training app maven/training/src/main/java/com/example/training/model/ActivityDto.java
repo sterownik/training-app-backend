@@ -9,7 +9,10 @@ public record ActivityDto(
         String type,
         Double distance,
         Double averageSpeed,
-        OffsetDateTime startDateLocal
+        OffsetDateTime startDateLocal,
+        Double averageWatts,
+        String description,
+        String photoUrl
 ) {
     public static ActivityDto from(Activity a) {
         return new ActivityDto(
@@ -17,7 +20,10 @@ public record ActivityDto(
                 a.getType(),
                 a.getDistance(),
                 a.getAverageSpeed(),
-                a.getStartDateLocal()
+                a.getStartDateLocal(),
+                a.getAverageWatts(),
+                a.getDescriptionTyped(),
+                a.getPhotoUrl()
         );
     }
 }

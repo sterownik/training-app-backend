@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StravaActivity {
@@ -14,6 +15,7 @@ public class StravaActivity {
     private Double max_heartrate;
     @JsonProperty("start_city")
     private String start_city;
+    private String description;
     private Double average_watts;
     private Double weighted_average_watts; // normalizowane waty
     private Long elapsed_time; // sekundy
@@ -125,6 +127,14 @@ public class StravaActivity {
         this.moving_time = moving_time;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Photos {
         private PhotoSummary primary;
@@ -135,9 +145,9 @@ public class StravaActivity {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PhotoSummary {
-        private String urls; // JSON z mapą rozdzielczości, np. "600":"https://..."
-        public String getUrls() { return urls; }
-        public void setUrls(String urls) { this.urls = urls; }
+        private Map<String, String> urls; // JSON z mapą rozdzielczości, np. "600":"https://..."
+        public Map<String, String> getUrls() { return urls; }
+        public void setUrls(Map<String, String> urls) { this.urls = urls; }
     }
 
     // gettery / settery

@@ -12,9 +12,18 @@ public record ActivityDto(
         OffsetDateTime startDateLocal,
         Double averageWatts,
         String description,
-        String photoUrl
+        String photoUrl,
+        Double moving_time,
+        Double averageHeartRate,
+        String pace
 ) {
     public static ActivityDto from(Activity a) {
+        String pace;
+        if(a.getType() == "Ride") {
+            pace = calculateAverageSpeed(a.getDistance(), a.getMoving_time()) + " km/h";
+        } else {
+            pace = paceFromDistanceAndMovingTime(a.getDistance(), a.getMoving_time());
+        }
         return new ActivityDto(
                 a.getId(),
                 a.getType(),
@@ -23,7 +32,44 @@ public record ActivityDto(
                 a.getStartDateLocal(),
                 a.getAverageWatts(),
                 a.getDescriptionTyped(),
-                a.getPhotoUrl()
+                a.getPhotoUrl(),
+                a.getMoving_time(),
+                a.getAverageHeartRate(),
+                pace
         );
+    }
+
+    public static String paceFromDistanceAndMovingTime(
+            Double distanceMeters,
+            Double movingTimeSeconds
+    ) {
+        if (distanceMeters == null || distanceMeters <= 0
+                || movingTimeSeconds == null || movingTimeSeconds <= 0) {
+            return null;
+        }
+
+        double paceSecondsPerKm =
+                movingTimeSeconds / (distanceMeters / 1000.0);
+
+        int minutes = (int) (paceSecondsPerKm / 60);
+        int seconds = (int) Math.round(paceSecondsPerKm % 60);
+
+        if (seconds == 60) {
+            minutes++;
+            seconds = 0;
+        }
+
+        return String.format("%d:%02d /km", minutes, seconds);
+    }
+
+    public static double calculateAverageSpeed(double distanceMeters, double movingTimeSeconds) {
+        if (movingTimeSeconds == 0) {
+            return 0;
+        }
+        double distanceKm = distanceMeters / 1000.0;
+        double timeHours = movingTimeSeconds / 3600.0;
+        double speed = distanceKm / timeHours;
+
+        return Math.round(speed * 100.0) / 100.0;
     }
 }

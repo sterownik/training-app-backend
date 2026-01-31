@@ -114,11 +114,12 @@ public class StravaActivityService {
                 activityDto.setMaxSpeed(maxSpeed);
                 activityDto.setStravaActivityId(a.getId());
                 activityDto.setStartDateLocal(a.getStartDateLocal());
+                System.out.println(a.getPhotos());
                 if(a.getPhotos() != null && a.getPhotos().getPrimary().getUrls() != null && a.getPhotos().getPrimary().getUrls().get("600") != null ) {
                     activityDto.setPhotoUrl(a.getPhotos().getPrimary().getUrls().get("600"));
                 }
 
-                activityDto.setDescriptionTyped(a.getDescription());
+                activityDto.setDescriptionTyped(a.getName());
 
 
 

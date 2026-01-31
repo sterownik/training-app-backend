@@ -3,7 +3,6 @@ package com.example.training.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Map;
 
@@ -15,7 +14,7 @@ public class StravaActivity {
     private Double max_heartrate;
     @JsonProperty("start_city")
     private String start_city;
-    private String description;
+    private String name;
     private Double average_watts;
     private Double weighted_average_watts; // normalizowane waty
     private Long elapsed_time; // sekundy
@@ -127,12 +126,12 @@ public class StravaActivity {
         this.moving_time = moving_time;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setName(String name) {
+        this.name = name;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

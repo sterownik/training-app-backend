@@ -5,6 +5,8 @@ import com.example.training.repository.ActivityRepository;
 import com.example.training.repository.UserRepository;
 import com.example.training.services.OpenAiService;
 import com.example.training.services.StravaActivityService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,11 +41,14 @@ public class StravaTrainingController {
 
     @GetMapping("/activities")
     public List<ActivityDto> callback(
-            @RequestParam String type,
-            Authentication auth
+            Authentication auth,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "id") String sortBy
     ) throws IOException {
         User user = (User) auth.getPrincipal();
-        return this.activityRepository.findByUserIdAndTypeOrderByStartDateLocalDesc(user.getId(), type).stream()
+        Pageable pageable = PageRequest.of(page, size);
+        return this.activityRepository.findByUserIdOrderByStartDateLocalDesc(user.getId(), pageable).stream()
                 .map(ActivityDto::from).toList();
     }
 

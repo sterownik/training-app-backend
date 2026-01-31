@@ -2,6 +2,7 @@ package com.example.training.repository;
 
 import com.example.training.model.Activity;
 import com.example.training.model.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.NativeQuery;
@@ -22,7 +23,13 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     List<Activity> findByUserIdAndTypeOrderByStartDateLocalDesc(
             Long userId,
-            String type
+            String type,
+            Pageable pageable
+    );
+
+    List<Activity> findByUserIdOrderByStartDateLocalDesc(
+            Long userId,
+            Pageable pageable
     );
 
     List<Activity> findByUserIdOrderByStartDateLocalDesc(

@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 public record ActivityDto(
         Long id,
         String type,
-        Double distance,
+        String distance,
         Double averageSpeed,
         OffsetDateTime startDateLocal,
         Double averageWatts,
@@ -42,7 +42,7 @@ public record ActivityDto(
         return new ActivityDto(
                 a.getId(),
                 a.getType(),
-                a.getDistance(),
+                a.getDistance() / 1000 +" km",
                 a.getAverageSpeed(),
                 a.getStartDateLocal(),
                 a.getAverageWatts(),

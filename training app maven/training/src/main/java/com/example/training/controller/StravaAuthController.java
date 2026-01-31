@@ -6,10 +6,12 @@ import com.example.training.repository.UserRepository;
 import com.example.training.services.StravaAuthService;
 import com.example.training.services.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/auth")
@@ -74,5 +76,16 @@ public class StravaAuthController {
         );
     }
 
+
+    @GetMapping("/me")
+    public Optional<User> meEnpoint(
+            Authentication auth,
+            HttpServletResponse response
+    ) throws IOException {
+        User user = (User) auth.getPrincipal();
+        Optional<User> findedUser = userRepository
+                .findByStravaAthleteId(user.getStravaAthleteId());
+        return findedUser;
+    }
 
 }

@@ -19,7 +19,7 @@ public record ActivityDto(
 ) {
     public static ActivityDto from(Activity a) {
         String pace;
-        if(a.getType() == "Ride") {
+        if(a.getType().contains("Ride")) {
             pace = calculateAverageSpeed(a.getDistance(), a.getMoving_time()) + " km/h";
         } else {
             pace = paceFromDistanceAndMovingTime(a.getDistance(), a.getMoving_time());
@@ -59,7 +59,7 @@ public record ActivityDto(
             seconds = 0;
         }
 
-        return String.format("%d:%02d /km", minutes, seconds);
+        return String.format("%d:%02d min/km", minutes, seconds);
     }
 
     public static double calculateAverageSpeed(double distanceMeters, double movingTimeSeconds) {

@@ -29,7 +29,7 @@ public record ActivityDto(
         int minutes = (int) (a.getMoving_time() / 60);
         int seconds = (int) Math.round(a.getMoving_time() % 60);
         if(hours > 0) {
-            movingTime = hours + " h " + ((a.getMoving_time() - (hours * 3600))/60) + " m";
+            movingTime = hours + " h " + (int)((a.getMoving_time() - (hours * 3600))/60) + " m";
         }
         else {
             movingTime = minutes + " m " + seconds + " s";

@@ -42,7 +42,7 @@ public record ActivityDto(
         return new ActivityDto(
                 a.getId(),
                 a.getType(),
-                a.getDistance() / 1000 +" km",
+                String.format("%.2f", a.getDistance() / 1000)+" km",
                 a.getAverageSpeed(),
                 a.getStartDateLocal(),
                 a.getAverageWatts(),

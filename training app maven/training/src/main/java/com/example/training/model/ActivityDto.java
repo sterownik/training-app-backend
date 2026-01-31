@@ -13,7 +13,7 @@ public record ActivityDto(
         Double averageWatts,
         String description,
         String photoUrl,
-        Double moving_time,
+        String moving_time,
         Double averageHeartRate,
         String pace
 ) {
@@ -24,6 +24,21 @@ public record ActivityDto(
         } else {
             pace = paceFromDistanceAndMovingTime(a.getDistance(), a.getMoving_time());
         }
+        String movingTime;
+        int hours = (int) (a.getMoving_time() % 3600);
+        int minutes = (int) (a.getMoving_time() / 60);
+        int seconds = (int) Math.round(a.getMoving_time() % 60);
+        if(hours > 0) {
+            movingTime = hours + " h " + ((a.getMoving_time() - (hours * 3600))/60) + " m";
+        }
+        else {
+            movingTime = minutes + " m " + seconds + " s";
+        }
+
+        if (seconds == 60) {
+            minutes++;
+            seconds = 0;
+        }
         return new ActivityDto(
                 a.getId(),
                 a.getType(),
@@ -33,7 +48,7 @@ public record ActivityDto(
                 a.getAverageWatts(),
                 a.getDescriptionTyped(),
                 a.getPhotoUrl(),
-                a.getMoving_time(),
+                movingTime,
                 a.getAverageHeartRate(),
                 pace
         );

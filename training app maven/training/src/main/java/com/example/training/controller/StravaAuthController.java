@@ -6,6 +6,7 @@ import com.example.training.repository.UserRepository;
 import com.example.training.services.StravaAuthService;
 import com.example.training.services.JwtService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,8 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 public class StravaAuthController {
+    @Value("${logging.api.callback}")
+    private String loggingApiCallback;
 
     private final UserRepository userRepository;
     private final StravaAuthService stravaAuthService;
@@ -72,7 +75,7 @@ public class StravaAuthController {
         String jwt = jwtService.generateToken(user);
 
         response.sendRedirect(
-                "http://localhost:4200/login-success?token=" + jwt +"client-id=" + token.getAthlete().getId()
+                this.loggingApiCallback + "/login-success?token=" + jwt
         );
     }
 

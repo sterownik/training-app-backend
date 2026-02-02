@@ -75,7 +75,7 @@ public class StravaAuthController {
         String jwt = jwtService.generateToken(user);
 
         response.sendRedirect(
-                this.loggingApiCallback + "/login-success?token=" + jwt
+                this.loggingApiCallback + "?token=" + jwt
         );
     }
 

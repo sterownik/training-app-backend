@@ -17,6 +17,14 @@
 	<licenses>
 		<license/>
 	</licenses>
+	<profiles>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<maven.test.skip>true</maven.test.skip>
+			</properties>
+		</profile>
+	</profiles>
 	<developers>
 		<developer/>
 	</developers>

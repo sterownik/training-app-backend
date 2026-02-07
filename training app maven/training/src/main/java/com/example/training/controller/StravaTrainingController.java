@@ -5,6 +5,7 @@ import com.example.training.repository.ActivityRepository;
 import com.example.training.repository.UserRepository;
 import com.example.training.services.OpenAiService;
 import com.example.training.services.StravaActivityService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/training")
@@ -38,6 +40,18 @@ public class StravaTrainingController {
                 .getActivitiesLastYear(user.getStravaAccessToken(), user);
         return "OK";
     }
+
+    @GetMapping("/me")
+    public Optional<User> meEnpoint(
+            Authentication auth,
+            HttpServletResponse response
+    ) throws IOException {
+        User user = (User) auth.getPrincipal();
+        Optional<User> findedUser = userRepository
+                .findById(user.getId());
+        return findedUser;
+    }
+
 
     @GetMapping("/activities")
     public List<ActivityDto> callback(

@@ -20,15 +20,5 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/me")
-    public Optional<User> meEnpoint(
-            Authentication auth,
-            HttpServletResponse response
-    ) throws IOException {
-        User user = (User) auth.getPrincipal();
-        Optional<User> findedUser = userRepository
-                .findByStravaAthleteId(user.getStravaAthleteId());
-        return findedUser;
-    }
 
 }

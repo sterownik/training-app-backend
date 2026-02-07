@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserRepository userRepository;
 
@@ -20,5 +20,14 @@ public class UserController {
         this.userRepository = userRepository;
     }
 
-
+    @GetMapping("/me")
+    public Optional<User> meEnpoint(
+            Authentication auth,
+            HttpServletResponse response
+    ) throws IOException {
+        User user = (User) auth.getPrincipal();
+        Optional<User> findedUser = userRepository
+                .findById(user.getId());
+        return findedUser;
+    }
 }

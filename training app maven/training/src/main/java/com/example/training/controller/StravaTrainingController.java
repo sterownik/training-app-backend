@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/training")
+@RequestMapping("/api/training")
 public class StravaTrainingController {
     private final UserRepository userRepository;
     private final StravaActivityService stravaActivityService;
@@ -40,18 +40,6 @@ public class StravaTrainingController {
                 .getActivitiesLastYear(user.getStravaAccessToken(), user);
         return "OK";
     }
-
-    @GetMapping("/me")
-    public Optional<User> meEnpoint(
-            Authentication auth,
-            HttpServletResponse response
-    ) throws IOException {
-        User user = (User) auth.getPrincipal();
-        Optional<User> findedUser = userRepository
-                .findById(user.getId());
-        return findedUser;
-    }
-
 
     @GetMapping("/activities")
     public List<ActivityDto> callback(

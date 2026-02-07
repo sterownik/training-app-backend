@@ -9,6 +9,8 @@ public class SpaController {
             "/",
             "/welcome",
             "/login",
+            "/media/Boathouse-Bold-MRRVS7RL.woff2",
+            "/media/Boathouse-Regular-WBB34DB6.woff2",
             "/dashboard",
             "/**/{path:[^\\.]*}"
     })

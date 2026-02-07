@@ -37,6 +37,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 path.equals("/") ||
                         path.equals("/index.html") ||
                         path.startsWith("/assets") ||
+                        path.startsWith("/media") ||
                         path.startsWith("/auth") ||
                         !path.startsWith("/api/user")
         ) {

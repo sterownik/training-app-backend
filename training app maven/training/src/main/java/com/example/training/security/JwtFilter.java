@@ -35,7 +35,10 @@ public class JwtFilter extends OncePerRequestFilter {
         // 🔥 IGNORUJ FRONTEND + AUTH
         if (
                 path.equals("/") ||
-                        path.equals("/index.html")
+                        path.equals("/index.html") ||
+                        path.startsWith("/assets") ||
+                        path.startsWith("/auth") ||
+                        !path.startsWith("/training")
         ) {
             chain.doFilter(request, response);
             return;

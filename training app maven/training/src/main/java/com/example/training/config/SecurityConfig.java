@@ -41,6 +41,7 @@ public class SecurityConfig {
                                 "/*.svg",
                                 "/assets/**"
                         ).permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

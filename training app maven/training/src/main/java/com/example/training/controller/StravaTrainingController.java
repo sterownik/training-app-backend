@@ -6,8 +6,10 @@ import com.example.training.repository.UserRepository;
 import com.example.training.services.OpenAiService;
 import com.example.training.services.StravaActivityService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,16 +44,16 @@ public class StravaTrainingController {
     }
 
     @GetMapping("/activities")
-    public List<ActivityDto> callback(
+    public Page<ActivityDto> callback(
             Authentication auth,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "id") String sortBy
     ) throws IOException {
         User user = (User) auth.getPrincipal();
-        Pageable pageable = PageRequest.of(page, size);
-        return this.activityRepository.findByUserIdOrderByStartDateLocalDesc(user.getId(), pageable).stream()
-                .map(ActivityDto::from).toList();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        return activityRepository.findByUserIdOrderByStartDateLocalDesc(user.getId(), pageable)
+                .map(ActivityDto::from);
     }
 
     @PostMapping("/send-to-chat")

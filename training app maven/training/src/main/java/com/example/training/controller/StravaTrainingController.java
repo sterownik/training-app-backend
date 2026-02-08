@@ -14,7 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -34,13 +36,15 @@ public class StravaTrainingController {
 
 
     @GetMapping("/activities/last-year")
-    public String getActivitiesLastYear(Authentication auth) {
+    public Map<String, String>  getActivitiesLastYear(Authentication auth) {
 
         User user = (User) auth.getPrincipal();
 
         stravaActivityService
                 .getActivitiesLastYear(user.getStravaAccessToken(), user);
-        return "OK";
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "ok");
+        return response;
     }
 
     @GetMapping("/activities")

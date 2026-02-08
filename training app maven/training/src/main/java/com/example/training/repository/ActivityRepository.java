@@ -2,6 +2,7 @@ package com.example.training.repository;
 
 import com.example.training.model.Activity;
 import com.example.training.model.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -27,7 +28,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
             Pageable pageable
     );
 
-    List<Activity> findByUserIdOrderByStartDateLocalDesc(
+    Page<Activity> findByUserIdOrderByStartDateLocalDesc(
             Long userId,
             Pageable pageable
     );

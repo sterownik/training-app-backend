@@ -40,7 +40,7 @@ public class StravaActivityService {
                 .map(d -> d.toInstant().getEpochSecond())
                 .orElseGet(() ->
                         Instant.now()
-                                .minus(365, ChronoUnit.DAYS)
+                                .minus(734, ChronoUnit.DAYS)
                                 .getEpochSecond()
                 );
 
@@ -216,7 +216,7 @@ public class StravaActivityService {
                     activityBike.setTotal_elevation_gain_m(a.getTotalElevationGain());
                     activityBike.setStrava_activity_id(a.getStravaActivityId());
                     activityBike.setNormalized_power(a.getNormalizedPower());
-                    activityBike.setDescription(a.getDescription());
+                    activityBike.setDescription(a.getDescription() + a.getDescriptionTyped());
                     actionsBike.getActivity().add(activityBike);
                     break;
 
@@ -229,7 +229,7 @@ public class StravaActivityService {
                     activityRun.setDate(a.getStartDateLocal().toLocalDate() + "");
                     activityRun.setTotal_elev_gain_m(a.getTotalElevationGain());
                     activityRun.setStrava_activity_id(a.getStravaActivityId());
-                    activityRun.setDescription(a.getDescription());
+                    activityRun.setDescription(a.getDescription() + a.getDescriptionTyped());
 
                     actionsRun.getActivity().add(activityRun);
                     break;
@@ -239,7 +239,7 @@ public class StravaActivityService {
                     activityWeightTraining.setMax_heart_rate_bpm(a.getMaxHeartRate());
                     activityWeightTraining.setDate(a.getStartDateLocal().toLocalDate() + "");
                     activityWeightTraining.setStrava_activity_id(a.getStravaActivityId());
-                    activityWeightTraining.setDescription(a.getDescription());
+                    activityWeightTraining.setDescription(a.getDescription() + a.getDescriptionTyped());
                     actionsWeightTraining.getActivity().add(activityWeightTraining);
                     break;
                 default:
@@ -250,7 +250,7 @@ public class StravaActivityService {
                     activityRest.setDistance_m(a.getDistance());
                     activityRest.setType_activity(a.getType());
                     activityRest.setStrava_activity_id(a.getStravaActivityId());
-                    activityRest.setDescription(a.getDescription());
+                    activityRest.setDescription(a.getDescription() + a.getDescriptionTyped());
                     actionsRest.getActivity().add(activityRest);
             }
         }

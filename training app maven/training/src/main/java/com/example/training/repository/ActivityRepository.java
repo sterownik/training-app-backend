@@ -38,7 +38,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     );
 
 
-    @NativeQuery("SELECT * FROM ACTIVITIES WHERE USER_ID = ?1 AND START_DATE_LOCAL >= ?2 AND START_DATE_LOCAL <= ?3")
+    @NativeQuery("SELECT * FROM ACTIVITIES WHERE USER_ID = ?1 AND START_DATE_LOCAL >= ?2 AND START_DATE_LOCAL <= ?3 order by START_DATE_LOCAL desc ")
     List<Activity> findByUserIdAndStartByStartDateLocalAndEnd(
             Long userId,
             Date startDateLocalStart,

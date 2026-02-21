@@ -61,17 +61,18 @@ public class StravaTrainingController {
     }
 
     @PostMapping("/send-to-chat")
-    public String sendToChat(@RequestBody Prompt prompt, Authentication auth) throws IOException {
+    public ReadyToSendAi sendToChat(@RequestBody Prompt prompt, Authentication auth) throws IOException {
 //        return prompt.getPrompt();
         User user = (User) auth.getPrincipal();
         ReadyToSendAi activitiesToPromptDto = stravaActivityService.prepareData(user, prompt.getFilterActivityType());
-        String systemPrompt =prompt.getPrompt();
-
-        try {
-            return openAiService.analyzeTraining(activitiesToPromptDto, systemPrompt);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return activitiesToPromptDto;
+//        String systemPrompt =prompt.getPrompt();
+//
+//        try {
+//            return openAiService.analyzeTraining(activitiesToPromptDto, systemPrompt);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     @PostMapping("/update-activity")

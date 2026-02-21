@@ -48,7 +48,7 @@ public record ActivityDto(
                 a.getAverageSpeed(),
                 a.getStartDateLocal(),
                 a.getAverageWatts(),
-                a.getDescriptionTyped(),
+                a.getDescription(),
                 a.getPhotoUrl(),
                 movingTime,
                 a.getAverageHeartRate(),

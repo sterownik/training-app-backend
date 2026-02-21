@@ -15,7 +15,9 @@ public record ActivityDto(
         String photoUrl,
         String moving_time,
         Double averageHeartRate,
-        String pace
+        String pace,
+        String descriptionTyped,
+        Double normalizedPower
 ) {
     public static ActivityDto from(Activity a) {
         String pace;
@@ -50,7 +52,9 @@ public record ActivityDto(
                 a.getPhotoUrl(),
                 movingTime,
                 a.getAverageHeartRate(),
-                pace
+                pace,
+                a.getDescriptionTyped(),
+                a.getNormalizedPower()
         );
     }
 

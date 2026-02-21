@@ -263,8 +263,8 @@ public class StravaActivityService {
 
         readyToSendAi.setActivities(activitiesToPromptDto);
         readyToSendAi.getLimitations().add("average_speed based on moving_time");
-        readyToSendAi.getLimitations().add("power is average power, not Garmin NP");
-        readyToSendAi.getLimitations().add("normalized power is not available");
+        readyToSendAi.getLimitations().add("power is average power");
+        readyToSendAi.getLimitations().add("normalized power is in some activities");
         readyToSendAi.getLimitations().add("null means missing sensor data, not zero");
         readyToSendAi.setAthleteContext(new ReadyToSendAi.AthleteContext());
 

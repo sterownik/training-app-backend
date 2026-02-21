@@ -119,7 +119,7 @@ public class StravaActivityService {
                     activityDto.setPhotoUrl(a.getPhotos().getPrimary().getUrls().get("600"));
                 }
 
-                activityDto.setDescriptionTyped(a.getName());
+                activityDto.setDescriptionTyped(null);
 
 
 

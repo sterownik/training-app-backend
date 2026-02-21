@@ -3,7 +3,7 @@ package com.example.training.model;
 public class UpdateActivity {
      private Double npPower;
      private Long id;
-     private String description;
+     private String descriptionTyped;
 
     public Double getNpPower() {
         return npPower;
@@ -21,11 +21,11 @@ public class UpdateActivity {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptionTyped() {
+        return descriptionTyped;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescriptionTyped(String descriptionTyped) {
+        this.descriptionTyped = descriptionTyped;
     }
 }

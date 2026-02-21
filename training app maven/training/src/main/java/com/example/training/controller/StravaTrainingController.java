@@ -79,8 +79,8 @@ public class StravaTrainingController {
             User user = (User) auth.getPrincipal();
         Activity a = activityRepository.findByIdAndUserId(updateActivity.getId(), user.getId());
 
-        if(updateActivity.getDescription() != null) {
-            a.setDescription(updateActivity.getDescription());
+        if(updateActivity.getDescriptionTyped() != null) {
+            a.setDescriptionTyped(updateActivity.getDescriptionTyped());
         }
         if(updateActivity.getNpPower() != null) {
             a.setNormalizedPower(updateActivity.getNpPower());

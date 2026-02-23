@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -27,79 +28,88 @@ public class StravaActivityService {
         this.openAiService = openAiService;
     }
 
-    public void updateLaps(String accessToken, User user) {
+    public void updateLaps(String accessToken, User user) throws InterruptedException {
         List<Activity> activities = activityRepository
-                .findFirst99ByUserIdOrderByStartDateLocalDesc(user.getId());
+                .findFirst99ByUserIdAndLapsIsNullOrderByStartDateLocalDesc(user.getId());
 
         for (Activity activity : activities) {
 
 
             if(activity.getLaps() == null) {
-                String url = "https://www.strava.com/api/v3/activities/" + activity.getStravaActivityId() + "/laps";
+                try {
+                    String url = "https://www.strava.com/api/v3/activities/" + activity.getStravaActivityId() + "/laps";
 
-                HttpHeaders headers = new HttpHeaders();
-                headers.setBearerAuth(accessToken);
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.setBearerAuth(accessToken);
 
-                HttpEntity<String> entity = new HttpEntity<>(headers);
+                    HttpEntity<String> entity = new HttpEntity<>(headers);
 
-                ResponseEntity<StravaLapDto[]> response = restTemplate.exchange(
-                        url,
-                        HttpMethod.GET,
-                        entity,
-                        StravaLapDto[].class
-                );
+                    ResponseEntity<StravaLapDto[]> response = restTemplate.exchange(
+                            url,
+                            HttpMethod.GET,
+                            entity,
+                            StravaLapDto[].class
+                    );
 
-                StravaLapDto[] lapsStrava = response.getBody();
-                StringBuilder descriptionBuilder = new StringBuilder();
+                    StravaLapDto[] lapsStrava = response.getBody();
+                    StringBuilder descriptionBuilder = new StringBuilder();
 
-                if(lapsStrava!=null && lapsStrava.length >0) {
-                    switch (activity.getType()) {
-                        case "Ride":
-                            for (StravaLapDto lapStrava : lapsStrava) {
-                                descriptionBuilder.append("\n")
-                                        .append(lapStrava.getName())
-                                        .append(" -dystans- ")
-                                        .append(lapStrava.getDistance())
-                                        .append(" -śr tętno- ")
-                                        .append(lapStrava.getAverageHeartrate())
-                                        .append(" -tempo- ")
-                                        .append(calculateAverageSpeed(lapStrava.getDistance(), lapStrava.getMovingTime()))
-                                        .append(" -śr waty- ")
-                                        .append(lapStrava.getAverageWatts() != null ? lapStrava.getAverageWatts() : "-")
-                                        .append(" -śr kadencja- ")
-                                        .append(lapStrava.getAverageCadence()!= null ?lapStrava.getAverageCadence() :  "-")
-                                        .append(" -czas- ")
-                                        .append(lapStrava.getMovingTime())
-                                        .append(" -max tętno- ")
-                                        .append(lapStrava.getMaxHeartrate());
-                            }
-                            break;
-                        case "Run":
-                            for (StravaLapDto lapStrava : lapsStrava) {
-                                descriptionBuilder.append("\n")
-                                        .append(lapStrava.getName())
-                                        .append(" -dystans- ")
-                                        .append(lapStrava.getDistance())
-                                        .append(" -śr tętno- ")
-                                        .append(lapStrava.getAverageHeartrate())
-                                        .append(" -tempo- ")
-                                        .append(paceFromDistanceAndMovingTime(lapStrava.getDistance(), Double.valueOf(lapStrava.getMovingTime())))
-                                        .append(" -maks tętno- ")
-                                        .append(lapStrava.getMaxHeartrate());
-                            }
-                            break;
+                    if (lapsStrava != null && lapsStrava.length > 0) {
+                        switch (activity.getType()) {
+                            case "Ride":
+                                for (StravaLapDto lapStrava : lapsStrava) {
+                                    descriptionBuilder.append("\n")
+                                            .append(lapStrava.getName())
+                                            .append(" -dystans- ")
+                                            .append(lapStrava.getDistance())
+                                            .append(" -śr tętno- ")
+                                            .append(lapStrava.getAverageHeartrate())
+                                            .append(" -tempo- ")
+                                            .append(calculateAverageSpeed(lapStrava.getDistance(), lapStrava.getMovingTime()))
+                                            .append(" -śr waty- ")
+                                            .append(lapStrava.getAverageWatts() != null ? lapStrava.getAverageWatts() : "-")
+                                            .append(" -śr kadencja- ")
+                                            .append(lapStrava.getAverageCadence() != null ? lapStrava.getAverageCadence() : "-")
+                                            .append(" -czas- ")
+                                            .append(lapStrava.getMovingTime())
+                                            .append(" -max tętno- ")
+                                            .append(lapStrava.getMaxHeartrate());
+                                }
+                                break;
+                            case "Run":
+                                for (StravaLapDto lapStrava : lapsStrava) {
+                                    descriptionBuilder.append("\n")
+                                            .append(lapStrava.getName())
+                                            .append(" -dystans- ")
+                                            .append(lapStrava.getDistance())
+                                            .append(" -śr tętno- ")
+                                            .append(lapStrava.getAverageHeartrate())
+                                            .append(" -tempo- ")
+                                            .append(paceFromDistanceAndMovingTime(lapStrava.getDistance(), Double.valueOf(lapStrava.getMovingTime())))
+                                            .append(" -maks tętno- ")
+                                            .append(lapStrava.getMaxHeartrate());
+                                }
+                                break;
 
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
+
+                    }
+                    if (!descriptionBuilder.toString().isEmpty()) {
+                        activity.setLaps(descriptionBuilder.toString());
+                        activityRepository.save(activity);
+                        Thread.sleep(100);
+                    }
+                }catch (HttpClientErrorException.TooManyRequests e) {
+                    // Jeśli dostaniesz 429, przerwij pętlę i spróbuj przy następnym uruchomieniu
+                    System.err.println("Przekroczono limit Stravy (429). Przerywam sesję.");
+                    break;
+                } catch (Exception e) {
+                    System.err.println("Błąd dla aktywności " + activity.getId() + ": " + e.getMessage());
                 }
 
             }
-                if(!descriptionBuilder.toString().isEmpty()) {
-                    System.out.println(descriptionBuilder);
-                    activity.setLaps(descriptionBuilder.toString());
-                    activityRepository.save(activity);
-                }
-        }
     }
     }
 

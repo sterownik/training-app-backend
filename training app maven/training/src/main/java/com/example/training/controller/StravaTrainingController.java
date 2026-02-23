@@ -36,7 +36,7 @@ public class StravaTrainingController {
 
 
     @GetMapping("/activities/last-year")
-    public Map<String, String>  getActivitiesLastYear(Authentication auth) {
+    public Map<String, String>  getActivitiesLastYear(Authentication auth) throws InterruptedException {
 
         User user = (User) auth.getPrincipal();
 

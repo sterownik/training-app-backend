@@ -30,7 +30,7 @@ public class StravaActivityService {
 
     public void updateLaps(String accessToken, User user) throws InterruptedException {
         List<Activity> activities = activityRepository
-                .findFirst60ByUserIdAndLapsIsNullOrderByStartDateLocalDesc(user.getId());
+                .findFirst60ByUserIdOrderByStartDateLocalDesc(user.getId());;
 
         for (Activity activity : activities) {
 

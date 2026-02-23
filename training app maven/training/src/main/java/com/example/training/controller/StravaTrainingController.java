@@ -43,8 +43,8 @@ public class StravaTrainingController {
         stravaActivityService
                 .getActivitiesLastYear(user.getStravaAccessToken(), user);
 
-        stravaActivityService
-                .updateLaps(user.getStravaAccessToken(), user);
+//        stravaActivityService
+//                .updateLaps(user.getStravaAccessToken(), user);
         Map<String, String> response = new HashMap<>();
         response.put("message", "ok");
         return response;

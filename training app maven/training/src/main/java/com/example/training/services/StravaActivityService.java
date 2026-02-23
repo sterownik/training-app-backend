@@ -34,7 +34,7 @@ public class StravaActivityService {
         for (Activity activity : activities) {
 
 
-            if(activity.getLaps() != null) {
+            if(activity.getLaps() == null) {
                 String url = "https://www.strava.com/api/v3/activities/" + activity.getStravaActivityId() + "/laps";
 
                 HttpHeaders headers = new HttpHeaders();

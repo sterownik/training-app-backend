@@ -29,7 +29,7 @@ public class StravaActivityService {
 
     public void updateLaps(String accessToken, User user) {
         List<Activity> activities = activityRepository
-                .findFirst2ByUserIdOrderByStartDateLocalDesc(user.getId());
+                .findFirst1ByUserIdOrderByStartDateLocalDesc(user.getId());
 
         for (Activity activity : activities) {
 

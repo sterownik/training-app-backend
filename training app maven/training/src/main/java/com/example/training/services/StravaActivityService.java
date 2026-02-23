@@ -30,12 +30,12 @@ public class StravaActivityService {
 
     public void updateLaps(String accessToken, User user) throws InterruptedException {
         List<Activity> activities = activityRepository
-                .findFirst99ByUserIdAndLapsIsNullOrderByStartDateLocalDesc(user.getId());
+                .findFirst60ByUserIdAndLapsIsNullOrderByStartDateLocalDesc(user.getId());
 
         for (Activity activity : activities) {
 
 
-            if(activity.getLaps() == null) {
+            if(activity.getLaps() == null && (activity.getType().contains("Ride") || activity.getType().contains("Run"))) {
                 try {
                     String url = "https://www.strava.com/api/v3/activities/" + activity.getStravaActivityId() + "/laps";
 

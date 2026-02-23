@@ -37,8 +37,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
             Long userId
     );
 
-    // Pobiera 99 najnowszych aktywności użytkownika, które NIE MAJĄ jeszcze przypisanych okrążeń
-    List<Activity> findFirst99ByUserIdAndLapsIsNullOrderByStartDateLocalDesc(Long userId);
+    // Pobiera 50 najnowszych aktywności użytkownika, które NIE MAJĄ jeszcze przypisanych okrążeń
+    List<Activity> findFirst60ByUserIdAndLapsIsNullOrderByStartDateLocalDesc(Long userId);
 
 
     @NativeQuery("SELECT * FROM ACTIVITIES WHERE USER_ID = ?1 AND START_DATE_LOCAL >= ?2 AND START_DATE_LOCAL <= ?3 order by START_DATE_LOCAL desc ")

@@ -29,7 +29,7 @@ public class StravaActivityService {
 
     public void updateLaps(String accessToken, User user) {
         List<Activity> activities = activityRepository
-                .findFirst1ByUserIdOrderByStartDateLocalDesc(user.getId());
+                .findFirst2ByUserIdOrderByStartDateLocalDesc(user.getId());
 
         for (Activity activity : activities) {
 
@@ -96,7 +96,7 @@ public class StravaActivityService {
             }
                 if(!descriptionBuilder.toString().isEmpty()) {
                     System.out.println(descriptionBuilder);
-                    activity.setLaps("tekst");
+                    activity.setLaps(descriptionBuilder.toString());
                     activityRepository.save(activity);
                 }
         }

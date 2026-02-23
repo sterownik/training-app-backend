@@ -37,7 +37,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
             Long userId
     );
 
-    List<Activity> findFirst1ByUserIdOrderByStartDateLocalDesc(
+    List<Activity> findFirst2ByUserIdOrderByStartDateLocalDesc(
             Long userId
     );
 

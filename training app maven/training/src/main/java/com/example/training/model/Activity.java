@@ -28,8 +28,6 @@ public class Activity
      @Column(length = 2000)
      private String type;
 
-
-     @Lob
      @Column(length = 5000, columnDefinition = "TEXT")
      private String laps;
 

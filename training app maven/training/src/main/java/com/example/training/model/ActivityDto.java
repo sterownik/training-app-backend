@@ -17,7 +17,8 @@ public record ActivityDto(
         Double averageHeartRate,
         String pace,
         String descriptionTyped,
-        Double normalizedPower
+        Double normalizedPower,
+        String laps
 ) {
     public static ActivityDto from(Activity a) {
         String pace;
@@ -54,7 +55,8 @@ public record ActivityDto(
                 a.getAverageHeartRate(),
                 pace,
                 a.getDescriptionTyped(),
-                a.getNormalizedPower()
+                a.getNormalizedPower(),
+                a.getLaps()
         );
     }
 

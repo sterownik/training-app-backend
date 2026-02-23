@@ -28,7 +28,9 @@ public class Activity
      @Column(length = 2000)
      private String type;
 
-     @Column(length = 5000)
+
+     @Lob
+     @Column(length = 5000, columnDefinition = "TEXT")
      private String laps;
 
      @Column(length = 2000)

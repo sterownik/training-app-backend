@@ -29,7 +29,7 @@ public class StravaActivityService {
 
     public void updateLaps(String accessToken, User user) {
         List<Activity> activities = activityRepository
-                .findFirst2ByUserIdOrderByStartDateLocalDesc(user.getId());
+                .findFirst99ByUserIdOrderByStartDateLocalDesc(user.getId());
 
         for (Activity activity : activities) {
 
@@ -58,19 +58,19 @@ public class StravaActivityService {
                             for (StravaLapDto lapStrava : lapsStrava) {
                                 descriptionBuilder.append("\n")
                                         .append(lapStrava.getName())
-                                        .append(" - dystans - ")
+                                        .append(" -dystans- ")
                                         .append(lapStrava.getDistance())
-                                        .append(" - śr tętno - ")
+                                        .append(" -śr tętno- ")
                                         .append(lapStrava.getAverageHeartrate())
-                                        .append(" - tempo - ")
+                                        .append(" -tempo- ")
                                         .append(calculateAverageSpeed(lapStrava.getDistance(), lapStrava.getMovingTime()))
-                                        .append(" - śr waty - ")
-                                        .append(lapStrava.getAverageWatts())
-                                        .append(" - śr kadencja - ")
-                                        .append(lapStrava.getAverageCadence())
-                                        .append(" - śr kadencja - ")
+                                        .append(" -śr waty- ")
+                                        .append(lapStrava.getAverageWatts() != null ? lapStrava.getAverageWatts() : "-")
+                                        .append(" -śr kadencja- ")
+                                        .append(lapStrava.getAverageCadence()!= null ?lapStrava.getAverageCadence() :  "-")
+                                        .append(" -czas- ")
                                         .append(lapStrava.getMovingTime())
-                                        .append(" - max tętno - ")
+                                        .append(" -max tętno- ")
                                         .append(lapStrava.getMaxHeartrate());
                             }
                             break;
@@ -78,13 +78,13 @@ public class StravaActivityService {
                             for (StravaLapDto lapStrava : lapsStrava) {
                                 descriptionBuilder.append("\n")
                                         .append(lapStrava.getName())
-                                        .append(" - dystans - ")
+                                        .append(" -dystans- ")
                                         .append(lapStrava.getDistance())
-                                        .append(" - śr tętno - ")
+                                        .append(" -śr tętno- ")
                                         .append(lapStrava.getAverageHeartrate())
-                                        .append(" - tempo - ")
+                                        .append(" -tempo- ")
                                         .append(paceFromDistanceAndMovingTime(lapStrava.getDistance(), Double.valueOf(lapStrava.getMovingTime())))
-                                        .append(" - maks tętno - ")
+                                        .append(" -maks tętno- ")
                                         .append(lapStrava.getMaxHeartrate());
                             }
                             break;

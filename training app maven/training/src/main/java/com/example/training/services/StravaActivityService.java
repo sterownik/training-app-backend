@@ -27,6 +27,81 @@ public class StravaActivityService {
         this.openAiService = openAiService;
     }
 
+    public void updateLaps(String accessToken, User user) {
+        List<Activity> activities = activityRepository
+                .findFirst2ByUserIdOrderByStartDateLocalDesc(user.getId());
+
+        for (Activity activity : activities) {
+
+
+            if(activity.getLaps() != null) {
+                String url = "https://www.strava.com/api/v3/activities/" + activity.getStravaActivityId() + "/laps";
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setBearerAuth(accessToken);
+
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+
+                ResponseEntity<StravaLapDto[]> response = restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        entity,
+                        StravaLapDto[].class
+                );
+
+                StravaLapDto[] lapsStrava = response.getBody();
+                StringBuilder descriptionBuilder = new StringBuilder();
+
+                if(lapsStrava!=null && lapsStrava.length >0) {
+                    switch (activity.getType()) {
+                        case "Ride":
+                            for (StravaLapDto lapStrava : lapsStrava) {
+                                descriptionBuilder.append("\n")
+                                        .append(lapStrava.getName())
+                                        .append(" - dystans - ")
+                                        .append(lapStrava.getDistance())
+                                        .append(" - śr tętno - ")
+                                        .append(lapStrava.getAverageHeartrate())
+                                        .append(" - tempo - ")
+                                        .append(calculateAverageSpeed(lapStrava.getDistance(), lapStrava.getMovingTime()))
+                                        .append(" - śr waty - ")
+                                        .append(lapStrava.getAverageWatts())
+                                        .append(" - śr kadencja - ")
+                                        .append(lapStrava.getAverageCadence())
+                                        .append(" - śr kadencja - ")
+                                        .append(lapStrava.getMovingTime())
+                                        .append(" - max tętno - ")
+                                        .append(lapStrava.getMaxHeartrate());
+                            }
+                            break;
+                        case "Run":
+                            for (StravaLapDto lapStrava : lapsStrava) {
+                                descriptionBuilder.append("\n")
+                                        .append(lapStrava.getName())
+                                        .append(" - dystans - ")
+                                        .append(lapStrava.getDistance())
+                                        .append(" - śr tętno - ")
+                                        .append(lapStrava.getAverageHeartrate())
+                                        .append(" - tempo - ")
+                                        .append(paceFromDistanceAndMovingTime(lapStrava.getDistance(), Double.valueOf(lapStrava.getMovingTime())))
+                                        .append(" - maks tętno - ")
+                                        .append(lapStrava.getMaxHeartrate());
+                            }
+                            break;
+
+                        default:
+                            break;
+                }
+
+            }
+                if(!descriptionBuilder.toString().isEmpty()) {
+                    activity.setDescription(descriptionBuilder.toString());
+                    activityRepository.save(activity);
+                }
+        }
+    }
+    }
+
     public void getActivitiesLastYear(String accessToken, User user) {
 
         Optional<OffsetDateTime> latest =

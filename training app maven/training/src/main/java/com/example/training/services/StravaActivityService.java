@@ -95,7 +95,7 @@ public class StravaActivityService {
 
             }
                 if(!descriptionBuilder.toString().isEmpty()) {
-                    activity.setDescription(descriptionBuilder.toString());
+                    activity.setLaps(descriptionBuilder.toString());
                     activityRepository.save(activity);
                 }
         }

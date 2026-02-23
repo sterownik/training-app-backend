@@ -28,6 +28,9 @@ public class Activity
      @Column(length = 2000)
      private String type;
 
+     @Column(length = 5000)
+     private String laps;
+
      @Column(length = 2000)
      private String description;
 
@@ -245,5 +248,13 @@ public class Activity
 
      public void setPhotoUrl(String photoUrl) {
          this.photoUrl = photoUrl;
+     }
+
+     public String getLaps() {
+         return laps;
+     }
+
+     public void setLaps(String laps) {
+         this.laps = laps;
      }
  }

@@ -18,6 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Arrays.stream;
 
 @RestController
 @RequestMapping("/api/training")
@@ -61,6 +65,13 @@ public class StravaTrainingController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
         return activityRepository.findByUserIdOrderByStartDateLocalDesc(user.getId(), pageable)
                 .map(ActivityDto::from);
+    }
+
+    @GetMapping("/activities-min")
+    public Stream<ActivityMinDto> activitiesMin(
+            Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return activityRepository.findByUserIdOrderByStartDateLocalDesc(user.getId()).stream().map(ActivityMinDto::from);
     }
 
     @PostMapping("/send-to-chat")

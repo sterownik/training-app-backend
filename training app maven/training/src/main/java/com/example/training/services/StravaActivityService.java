@@ -279,7 +279,12 @@ public class StravaActivityService {
         System.out.println(filterActivityType.getFilterType());
         if(filterActivityType.getFilterType().contains("date")) {
             activities = activityRepository.findByUserIdAndStartByStartDateLocalAndEnd(user.getId(), filterActivityType.getStartDateLocalStart(), filterActivityType.getStartDateLocalEnd());
-        } else {
+        }
+        else if(filterActivityType.getActivityIds() != null) {
+            activities = activityRepository.findByUserIdAndIdInOrderByStartDateLocalDesc(user.getId(), filterActivityType.getActivityIds());
+        }
+        else {
+
             activities = activityRepository.findByUserIdOrderByStartDateLocalDesc(user.getId());
         }
 

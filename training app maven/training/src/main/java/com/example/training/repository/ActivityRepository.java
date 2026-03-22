@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,8 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByUserIdOrderByStartDateLocalDesc(
             Long userId
     );
+
+    List<Activity> findByUserIdAndIdInOrderByStartDateLocalDesc(Long userId, Optional<ArrayList<Long>> ids);
 
     // Pobiera 50 najnowszych aktywności użytkownika, które NIE MAJĄ jeszcze przypisanych okrążeń
     List<Activity> findFirst60ByUserIdOrderByStartDateLocalDesc(Long userId);

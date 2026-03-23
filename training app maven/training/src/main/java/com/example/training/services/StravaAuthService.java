@@ -6,6 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class StravaAuthService {
@@ -36,5 +40,21 @@ public class StravaAuthService {
                 )
                 .retrieve()
                 .body(StravaTokenResponse.class);
+    }
+
+    public StravaTokenResponse refreshAccessToken(String refreshToken) {
+        Map<String, String> body = new HashMap<>();
+        body.put("client_id", clientId);
+        body.put("client_secret", clientSecret);
+        body.put("grant_type", "refresh_token");
+        body.put("refresh_token", refreshToken);
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        return restTemplate.postForObject(
+                TOKEN_URL,
+                body,
+                StravaTokenResponse.class
+        );
     }
 }

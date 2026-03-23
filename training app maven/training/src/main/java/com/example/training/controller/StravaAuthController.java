@@ -79,6 +79,29 @@ public class StravaAuthController {
         );
     }
 
+    @PostMapping("/strava/refresh")
+    public StravaTokenResponse refreshStravaToken(Authentication authentication) {
+
+        String userId = authentication.getName();
+
+        User user = userRepository.findById(Long.valueOf(userId))
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        StravaTokenResponse newToken =
+                stravaAuthService.refreshAccessToken(user.getStravaRefreshToken());
+
+        // update danych
+        user.setStravaAccessToken(newToken.getAccess_token());
+        user.setStravaRefreshToken(newToken.getRefresh_token());
+        user.setStravaTokenExpiresAt(
+                Instant.ofEpochSecond(newToken.getExpires_at())
+        );
+
+        userRepository.save(user);
+
+        return newToken;
+    }
+
 
 
 }

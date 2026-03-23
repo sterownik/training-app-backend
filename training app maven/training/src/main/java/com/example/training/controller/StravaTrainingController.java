@@ -71,7 +71,7 @@ public class StravaTrainingController {
     public Stream<ActivityMinDto> activitiesMin(
             Authentication auth) {
         User user = (User) auth.getPrincipal();
-        return activityRepository.findByUserIdOrderByStartDateLocalDesc(user.getId()).stream().map(ActivityMinDto::from);
+        return activityRepository.findFirst30ByUserIdOrderByStartDateLocalDesc(user.getId()).stream().map(ActivityMinDto::from);
     }
 
     @PostMapping("/send-to-chat")

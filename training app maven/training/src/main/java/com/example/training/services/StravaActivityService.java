@@ -285,7 +285,7 @@ public class StravaActivityService {
         }
         else {
 
-            activities = activityRepository.findByUserIdOrderByStartDateLocalDesc(user.getId());
+            activities = activityRepository.findFirst30ByUserIdOrderByStartDateLocalDesc(user.getId());
         }
 
         for (Activity a : activities) {

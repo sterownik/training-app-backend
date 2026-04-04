@@ -5,12 +5,14 @@ import com.example.training.model.ReadyToSendAi;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+@Service
 public class ExportService {
 
     private StravaActivityService stravaActivityService;

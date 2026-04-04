@@ -112,7 +112,7 @@ public class StravaTrainingController {
     @GetMapping("/activities/excel")
     public ResponseEntity<byte[]> downloadExcel(Authentication auth) throws IOException {
         User user = (User) auth.getPrincipal();
-        HSSFWorkbook workbook = exportService.export(activityRepository.findAllByUserOrderByStartDateLocalDesc(user)); // Twoja metoda
+        HSSFWorkbook workbook = exportService.export(activityRepository.findAllOrderByStartDateLocalDesc()); // Twoja metoda
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         workbook.write(out);

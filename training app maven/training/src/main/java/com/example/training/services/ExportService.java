@@ -48,7 +48,11 @@ public class ExportService {
             row.createCell(3).setCellValue(activity.getMaxHeartRate());
             row.createCell(4).setCellValue(activity.getStartDateLocal().toLocalDateTime());
             row.createCell(5).setCellValue(activity.getAverageWatts());
-            row.createCell(6).setCellValue(activity.getNormalizedPower());
+            if(activity.getNormalizedPower() != null ) {
+                row.createCell(6).setCellValue(activity.getNormalizedPower());
+            } else {
+                row.createCell(6).setCellValue("");
+            }
             row.createCell(7).setCellValue(activity.getElapsedTime());
 
             row.createCell(8).setCellValue(activity.getLaps());

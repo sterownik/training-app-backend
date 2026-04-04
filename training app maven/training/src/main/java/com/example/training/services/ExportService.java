@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -42,29 +43,37 @@ public class ExportService {
         for (Activity activity : activities) {
             HSSFRow row = sheet.createRow(rowNum++);
 
-            row.createCell(0).setCellValue(activity.getType());
-            row.createCell(1).setCellValue(activity.getDistance());
-            row.createCell(2).setCellValue(activity.getAverageHeartRate());
-            row.createCell(3).setCellValue(activity.getMaxHeartRate());
-            row.createCell(4).setCellValue(activity.getStartDateLocal().toLocalDateTime());
-            row.createCell(5).setCellValue(activity.getAverageWatts());
-            if(activity.getNormalizedPower() != null ) {
-                row.createCell(6).setCellValue(activity.getNormalizedPower());
-            } else {
-                row.createCell(6).setCellValue("");
-            }
-            row.createCell(7).setCellValue(activity.getElapsedTime());
+            row.createCell(0).setCellValue(activity.getType() != null ? activity.getType() : "");
+            row.createCell(1).setCellValue(activity.getDistance() != null ? activity.getDistance() : 0);
+            row.createCell(2).setCellValue(activity.getAverageHeartRate() != null ? activity.getAverageHeartRate() : 0);
+            row.createCell(3).setCellValue(activity.getMaxHeartRate() != null ? activity.getMaxHeartRate() : 0);
+            row.createCell(4).setCellValue(activity.getStartDateLocal() != null ? activity.getStartDateLocal().toLocalDateTime().toString() : "");
+            row.createCell(5).setCellValue(activity.getAverageWatts() != null ? activity.getAverageWatts() : 0);
+            row.createCell(6).setCellValue((Date) (activity.getNormalizedPower() != null ? activity.getNormalizedPower() : ""));
+            row.createCell(7).setCellValue(activity.getElapsedTime() != null ? activity.getElapsedTime() : 0);
+            row.createCell(8).setCellValue(activity.getLaps() != null ? activity.getLaps() : "");
+            row.createCell(9).setCellValue(
+                    (activity.getDescription() != null ? activity.getDescription() : "") + " " +
+                            (activity.getDescriptionTyped() != null ? activity.getDescriptionTyped() : "")
+            );
 
-            row.createCell(8).setCellValue(activity.getLaps());
-            row.createCell(9).setCellValue(activity.getDescription() + ' ' + activity.getDescriptionTyped());
-            switch (activity.getType()) {
-                case "Ride":
-                    row.createCell(10).setCellValue(stravaActivityService.calculateAverageSpeed(activity.getDistance(), activity.getMoving_time()) + "KM/H");
-                    break;
-                default:
-                    row.createCell(10).setCellValue(stravaActivityService.paceFromDistanceAndMovingTime(activity.getDistance(), activity.getMoving_time()) + "MIN/KM");
+            if ("Ride".equals(activity.getType())) {
+                row.createCell(10).setCellValue(
+                        stravaActivityService.calculateAverageSpeed(
+                                activity.getDistance() != null ? activity.getDistance() : 0,
+                                activity.getMoving_time() != null ? activity.getMoving_time() : 0
+                        ) + "KM/H"
+                );
+            } else {
+                row.createCell(10).setCellValue(
+                        stravaActivityService.paceFromDistanceAndMovingTime(
+                                activity.getDistance() != null ? activity.getDistance() : 0,
+                                activity.getMoving_time() != null ? activity.getMoving_time() : 0
+                        ) + "MIN/KM"
+                );
             }
-            row.createCell(11).setCellValue(activity.getTotalElevationGain());
+
+            row.createCell(11).setCellValue(activity.getTotalElevationGain() != null ? activity.getTotalElevationGain() : 0);
         }
 
         // 🔹 Zapis do pliku

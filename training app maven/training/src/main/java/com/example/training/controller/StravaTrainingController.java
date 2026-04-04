@@ -3,16 +3,20 @@ package com.example.training.controller;
 import com.example.training.model.*;
 import com.example.training.repository.ActivityRepository;
 import com.example.training.repository.UserRepository;
+import com.example.training.services.ExportService;
 import com.example.training.services.OpenAiService;
 import com.example.training.services.StravaActivityService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +33,14 @@ public class StravaTrainingController {
     private final UserRepository userRepository;
     private final StravaActivityService stravaActivityService;
     private final OpenAiService openAiService;
+    private final ExportService exportService;
     private final ActivityRepository activityRepository;
 
-    public StravaTrainingController(UserRepository userRepository, StravaActivityService stravaActivityService, OpenAiService openAiService, ActivityRepository activityRepository) {
+    public StravaTrainingController(UserRepository userRepository, StravaActivityService stravaActivityService, OpenAiService openAiService, ExportService exportService, ActivityRepository activityRepository) {
         this.userRepository = userRepository;
         this.stravaActivityService = stravaActivityService;
         this.openAiService = openAiService;
+        this.exportService = exportService;
         this.activityRepository = activityRepository;
     }
 
@@ -101,5 +107,27 @@ public class StravaTrainingController {
             a.setNormalizedPower(updateActivity.getNpPower());
         }
         activityRepository.save(a);
+    }
+
+    @GetMapping("/activities/excel")
+    public ResponseEntity<byte[]> downloadExcel(Authentication auth) throws IOException {
+        User user = (User) auth.getPrincipal();
+        HSSFWorkbook workbook = exportService.export(activityRepository.findAllByUserOrderByStartDateLocalDesc(user)); // Twoja metoda
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        workbook.write(out);
+        workbook.close();
+
+        byte[] bytes = out.toByteArray();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDisposition(
+                ContentDisposition.builder("attachment")
+                        .filename("aktywności.xls")
+                        .build()
+        );
+
+        return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
     }
 }

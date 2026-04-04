@@ -44,14 +44,14 @@ public class ExportService {
             HSSFRow row = sheet.createRow(rowNum++);
 
             row.createCell(0).setCellValue(activity.getType() != null ? activity.getType() : "");
-            row.createCell(1).setCellValue(activity.getDistance() != null ? activity.getDistance() : 0);
-            row.createCell(2).setCellValue(activity.getAverageHeartRate() != null ? activity.getAverageHeartRate() : 0);
-            row.createCell(3).setCellValue(activity.getMaxHeartRate() != null ? activity.getMaxHeartRate() : 0);
+            row.createCell(1).setCellValue(activity.getDistance() != null ? activity.getDistance().toString() : "");
+            row.createCell(2).setCellValue(activity.getAverageHeartRate() != null ? activity.getAverageHeartRate().toString() : "");
+            row.createCell(3).setCellValue(activity.getMaxHeartRate() != null ? activity.getMaxHeartRate().toString() : "");
             row.createCell(4).setCellValue(activity.getStartDateLocal() != null ? activity.getStartDateLocal().toLocalDateTime().toString() : "");
-            row.createCell(5).setCellValue(activity.getAverageWatts() != null ? activity.getAverageWatts() : 0);
-            row.createCell(6).setCellValue((Date) (activity.getNormalizedPower() != null ? activity.getNormalizedPower() : ""));
-            row.createCell(7).setCellValue(activity.getElapsedTime() != null ? activity.getElapsedTime() : 0);
-            row.createCell(8).setCellValue(activity.getLaps() != null ? activity.getLaps() : "");
+            row.createCell(5).setCellValue(activity.getAverageWatts() != null ? activity.getAverageWatts().toString() : "");
+            row.createCell(6).setCellValue(activity.getNormalizedPower() != null ? activity.getNormalizedPower().toString() : "");
+            row.createCell(7).setCellValue(activity.getElapsedTime() != null ? activity.getElapsedTime().toString() : "");
+            row.createCell(8).setCellValue(activity.getLaps() != null ? activity.getLaps().toString() : "");
             row.createCell(9).setCellValue(
                     (activity.getDescription() != null ? activity.getDescription() : "") + " " +
                             (activity.getDescriptionTyped() != null ? activity.getDescriptionTyped() : "")

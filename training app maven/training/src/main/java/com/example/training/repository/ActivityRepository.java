@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
-    List<Activity> findAllOrderByStartDateLocalDesc();
+    List<Activity> findAllByOrderByStartDateLocalDesc();
 
     Optional<Activity> findFirstByUserIdOrderByStartDateLocalDesc(Long userId);
 

@@ -124,7 +124,7 @@ public class StravaTrainingController {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDisposition(
                 ContentDisposition.builder("attachment")
-                        .filename("aktywności.xls")
+                        .filename("aktywności.csv")
                         .build()
         );
 

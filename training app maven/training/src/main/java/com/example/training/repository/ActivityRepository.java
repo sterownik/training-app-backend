@@ -34,7 +34,7 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
             Pageable pageable
     );
 
-    List<Activity> findFirst30ByUserIdOrderByStartDateLocalDesc(
+    List<Activity> findFirst10ByUserIdOrderByStartDateLocalDesc(
             Long userId
     );
 

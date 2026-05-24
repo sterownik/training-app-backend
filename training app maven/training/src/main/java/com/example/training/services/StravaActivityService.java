@@ -257,7 +257,9 @@ public class StravaActivityService {
         return Math.round(speedKmh * 100.0) / 100.0;
     }
 
-    public ReadyToSendAi prepareData(User user, FilterActivityType filterActivityType) {
+    public ReadyToSendAi prepareData(User user
+// FilterActivityType filterActivityType
+    ) {
         ActivitiesToPromptDto activitiesToPromptDto = new ActivitiesToPromptDto();
         AcitivityBase<ActivityBike> actionsBike = new AcitivityBase<ActivityBike>();
         AcitivityBase<ActivityRun> actionsRun = new AcitivityBase<ActivityRun>();
@@ -276,17 +278,17 @@ public class StravaActivityService {
         actionsWeightTraining.setDescription("czas w sekundach najczesciej na treningu robie nogi 5 min rowerku goblet squad, step up hipthrust, plank wspecie na palce, wykroki  tetno w bpm");
         actionsRest.setDescription("rozne aktywnosci predkosc w km/h dystans w metrach czas w sekundach przewyzszenie w metrach  tetno w bpm");
         List<Activity> activities;
-        System.out.println(filterActivityType.getFilterType());
-        if(filterActivityType.getFilterType().contains("date")) {
-            activities = activityRepository.findByUserIdAndStartByStartDateLocalAndEnd(user.getId(), filterActivityType.getStartDateLocalStart(), filterActivityType.getStartDateLocalEnd());
-        }
-        else if(filterActivityType.getActivityIds() != null) {
-            activities = activityRepository.findByUserIdAndIdInOrderByStartDateLocalDesc(user.getId(), filterActivityType.getActivityIds());
-        }
-        else {
+//        System.out.println(filterActivityType.getFilterType());
+//        if(filterActivityType.getFilterType().contains("date")) {
+//            activities = activityRepository.findByUserIdAndStartByStartDateLocalAndEnd(user.getId(), filterActivityType.getStartDateLocalStart(), filterActivityType.getStartDateLocalEnd());
+//        }
+//        else if(filterActivityType.getActivityIds() != null) {
+//            activities = activityRepository.findByUserIdAndIdInOrderByStartDateLocalDesc(user.getId(), filterActivityType.getActivityIds());
+//        }
+//        else {
 
-            activities = activityRepository.findFirst30ByUserIdOrderByStartDateLocalDesc(user.getId());
-        }
+            activities = activityRepository.findFirst10ByUserIdOrderByStartDateLocalDesc(user.getId());
+//        }
 
         for (Activity a : activities) {
             ActivityBike activityBike = new ActivityBike();

@@ -2,7 +2,9 @@ package com.example.training.controller;
 
 import com.example.training.model.*;
 import com.example.training.repository.ActivityRepository;
+import com.example.training.repository.ChatMessageRepository;
 import com.example.training.repository.UserRepository;
+import com.example.training.services.ChatService;
 import com.example.training.services.ExportService;
 import com.example.training.services.OpenAiService;
 import com.example.training.services.StravaActivityService;
@@ -35,13 +37,17 @@ public class StravaTrainingController {
     private final OpenAiService openAiService;
     private final ExportService exportService;
     private final ActivityRepository activityRepository;
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatService chatService;
 
-    public StravaTrainingController(UserRepository userRepository, StravaActivityService stravaActivityService, OpenAiService openAiService, ExportService exportService, ActivityRepository activityRepository) {
+    public StravaTrainingController(UserRepository userRepository, StravaActivityService stravaActivityService, OpenAiService openAiService, ExportService exportService, ActivityRepository activityRepository, ChatMessageRepository chatMessageRepository, ChatService chatService) {
         this.userRepository = userRepository;
         this.stravaActivityService = stravaActivityService;
         this.openAiService = openAiService;
         this.exportService = exportService;
         this.activityRepository = activityRepository;
+        this.chatMessageRepository = chatMessageRepository;
+        this.chatService = chatService;
     }
 
 
@@ -77,22 +83,14 @@ public class StravaTrainingController {
     public Stream<ActivityMinDto> activitiesMin(
             Authentication auth) {
         User user = (User) auth.getPrincipal();
-        return activityRepository.findFirst30ByUserIdOrderByStartDateLocalDesc(user.getId()).stream().map(ActivityMinDto::from);
+        return activityRepository.findFirst10ByUserIdOrderByStartDateLocalDesc(user.getId()).stream().map(ActivityMinDto::from);
     }
 
     @PostMapping("/send-to-chat")
-    public String sendToChat(@RequestBody Prompt prompt, Authentication auth) throws IOException {
+    public ChatResponse sendToChat(@RequestBody ChatRequest prompt, Authentication auth) throws Exception {
 //        return prompt.getPrompt();
         User user = (User) auth.getPrincipal();
-        ReadyToSendAi activitiesToPromptDto = stravaActivityService.prepareData(user, prompt.getFilterActivityType());
-//        return activitiesToPromptDto;
-        String systemPrompt =prompt.getPrompt();
-
-        try {
-            return openAiService.analyzeTraining(activitiesToPromptDto, systemPrompt);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return chatService.chat(prompt, user);
     }
 
     @PostMapping("/update-activity")
@@ -129,5 +127,12 @@ public class StravaTrainingController {
         );
 
         return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/last-chat")
+    public List<ChatMessage> lastChat(
+            Authentication auth) {
+        User user = (User) auth.getPrincipal();
+        return chatMessageRepository.findLatestChatMessages(user.getId());
     }
 }

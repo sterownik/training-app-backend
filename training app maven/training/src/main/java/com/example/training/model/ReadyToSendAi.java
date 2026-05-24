@@ -28,7 +28,8 @@ public class ReadyToSendAi {
     public static class AthleteContext {
         public final String sport_background = "cycling + running";
         public final String goal =  "general fitness / FTP improvement";
-        public final String experience_level = "trained amateur";
+        public final String experience_level = "próg przemian tlenowych 200 watt 168 bpm, beztletnowych 250watt 189 bpm" +
+                ", hemoglobina 16,7 g/dl, hemokryt 48%, vo2max 55, waga 67kg";
 
         public AthleteContext() {
         }

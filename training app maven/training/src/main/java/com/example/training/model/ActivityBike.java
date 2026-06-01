@@ -5,7 +5,6 @@ public class ActivityBike extends ActivityToPromptDetailsDto {
           private Number avg_watts;
           private Number normalized_power;
           private Number avg_speed_km_h;
-          private Number max_speed_km_h;
           private Number total_elevation_gain_m;
 
     public Number getDistance_m() {
@@ -30,14 +29,6 @@ public class ActivityBike extends ActivityToPromptDetailsDto {
 
     public void setAvg_speed_km_h(Number avg_speed) {
         this.avg_speed_km_h = avg_speed;
-    }
-
-    public Number getMax_speed_km_h() {
-        return max_speed_km_h;
-    }
-
-    public void setMax_speed_km_h(Number max_speed) {
-        this.max_speed_km_h = max_speed;
     }
 
     public Number getTotal_elevation_gain_m() {

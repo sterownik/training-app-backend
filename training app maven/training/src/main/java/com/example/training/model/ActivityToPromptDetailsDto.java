@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class ActivityToPromptDetailsDto {
     private Number elapsed_time_in_sec;
     private Number avg_heart_rate_bpm;
-    private Number max_heart_rate_bpm;
     private String date;
     private Number strava_activity_id;
     private String description;
@@ -17,14 +16,6 @@ public class ActivityToPromptDetailsDto {
 
     public void setAvg_heart_rate_bpm(Number avg_heart_rate_bpm) {
         this.avg_heart_rate_bpm = avg_heart_rate_bpm;
-    }
-
-    public Number getMax_heart_rate_bpm() {
-        return max_heart_rate_bpm;
-    }
-
-    public void setMax_heart_rate_bpm(Number max_heart_rate_bpm) {
-        this.max_heart_rate_bpm = max_heart_rate_bpm;
     }
 
     public String getDate() {

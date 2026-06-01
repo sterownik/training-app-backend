@@ -301,11 +301,11 @@ public class StravaActivityService {
                     activityBike.setElapsed_time_in_sec(a.getElapsedTime());
                     activityBike.setDistance_m(a.getDistance());
                     activityBike.setAvg_heart_rate_bpm(a.getAverageHeartRate());
-                    activityBike.setMax_heart_rate_bpm(a.getMaxHeartRate());
+//                    activityBike.setMax_heart_rate_bpm(a.getMaxHeartRate());
                     activityBike.setDate(a.getStartDateLocal().toLocalDate() + "");
                     activityBike.setAvg_watts(a.getAverageWatts());
                     activityBike.setAvg_speed_km_h(calculateAverageSpeed(a.getDistance(), a.getMoving_time()));
-                    activityBike.setMax_speed_km_h(convertMsToKmh(a.getMaxSpeed()));
+//                    activityBike.setMax_speed_km_h(convertMsToKmh(a.getMaxSpeed()));
                     activityBike.setTotal_elevation_gain_m(a.getTotalElevationGain());
                     activityBike.setStrava_activity_id(a.getStravaActivityId());
                     activityBike.setNormalized_power(a.getNormalizedPower());
@@ -318,7 +318,7 @@ public class StravaActivityService {
                     activityRun.setElapsed_time_in_sec(a.getElapsedTime());
                     activityRun.setDistance_m(a.getDistance());
                     activityRun.setAvg_heart_rate_bpm(a.getAverageHeartRate());
-                    activityRun.setMax_heart_rate_bpm(a.getMaxHeartRate());
+//                    activityRun.setMax_heart_rate_bpm(a.getMaxHeartRate());
                     activityRun.setDate(a.getStartDateLocal().toLocalDate() + "");
                     activityRun.setTotal_elev_gain_m(a.getTotalElevationGain());
                     activityRun.setStrava_activity_id(a.getStravaActivityId());
@@ -329,7 +329,7 @@ public class StravaActivityService {
                 case "WeightTraining":
                     activityWeightTraining.setElapsed_time_in_sec(a.getElapsedTime());
                     activityWeightTraining.setAvg_heart_rate_bpm(a.getAverageHeartRate());
-                    activityWeightTraining.setMax_heart_rate_bpm(a.getMaxHeartRate());
+//                    activityWeightTraining.setMax_heart_rate_bpm(a.getMaxHeartRate());
                     activityWeightTraining.setDate(a.getStartDateLocal().toLocalDate() + "");
                     activityWeightTraining.setStrava_activity_id(a.getStravaActivityId());
                     activityWeightTraining.setDescription(a.getDescription() + (a.getDescriptionTyped() == null ? "" : " " + a.getDescriptionTyped()));
@@ -338,7 +338,7 @@ public class StravaActivityService {
                 default:
                     activityRest.setElapsed_time_in_sec(a.getElapsedTime());
                     activityRest.setAvg_heart_rate_bpm(a.getAverageHeartRate());
-                    activityRest.setMax_heart_rate_bpm(a.getMaxHeartRate());
+//                    activityRest.setMax_heart_rate_bpm(a.getMaxHeartRate());
                     activityRest.setDate(a.getStartDateLocal().toLocalDate() + "");
                     activityRest.setDistance_m(a.getDistance());
                     activityRest.setType_activity(a.getType());

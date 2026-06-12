@@ -2,6 +2,7 @@ package com.example.training.services;
 
 import com.example.training.model.*;
 import com.example.training.repository.ActivityRepository;
+import com.example.training.repository.UserRepository;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,10 +22,12 @@ public class StravaActivityService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ActivityRepository activityRepository;
+    private final UserRepository userRepository;
     private final OpenAiService openAiService;
 
-    public StravaActivityService(ActivityRepository activityRepository, OpenAiService openAiService) {
+    public StravaActivityService(ActivityRepository activityRepository, UserRepository userRepository, OpenAiService openAiService) {
         this.activityRepository = activityRepository;
+        this.userRepository = userRepository;
         this.openAiService = openAiService;
     }
 
@@ -359,7 +362,12 @@ public class StravaActivityService {
         readyToSendAi.getLimitations().add("power is average power");
         readyToSendAi.getLimitations().add("normalized power is in some activities");
         readyToSendAi.getLimitations().add("null means missing sensor data, not zero");
-        readyToSendAi.setAthleteContext(new ReadyToSendAi.AthleteContext());
+
+        readyToSendAi.setAthleteContext(
+                userRepository.findById(user.getId())
+                        .map(User::getAthleteInfo)
+                        .orElse("")
+        );
 
         return readyToSendAi;
     }

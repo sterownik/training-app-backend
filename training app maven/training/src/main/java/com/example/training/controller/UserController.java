@@ -4,9 +4,7 @@ import com.example.training.model.User;
 import com.example.training.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -30,4 +28,31 @@ public class UserController {
                 .findById(user.getId());
         return findedUser;
     }
+
+    @GetMapping("/is-user-info")
+    public Boolean isUserInfo(
+            Authentication auth
+    ) throws IOException {
+        User user = (User) auth.getPrincipal();
+        Boolean isInfo = userRepository.findById(user.getId())
+                .map(User::getAthleteInfo)
+                .isPresent();
+        return isInfo;
+    }
+
+
+    @PostMapping("/athlete-info")
+    public void saveAthleteInfo(
+            Authentication auth,
+            @RequestBody String athleteInfo
+    ) {
+        User user = (User) auth.getPrincipal();
+
+        User dbUser = userRepository.findById(user.getId())
+                .orElseThrow();
+
+        dbUser.setAthleteInfo(athleteInfo);
+        userRepository.save(dbUser);
+    }
+
 }

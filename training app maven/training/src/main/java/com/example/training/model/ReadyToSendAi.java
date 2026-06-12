@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class ReadyToSendAi {
     private final String source = "strava";
     private final ArrayList<String> limitations = new ArrayList<>();
-    private AthleteContext athleteContext;
+    private String athleteContext;
     private ActivitiesToPromptDto activities;
 
 
@@ -17,11 +17,11 @@ public class ReadyToSendAi {
         this.activities = activities;
     }
 
-    public AthleteContext getAthleteContext() {
+    public String getAthleteContext() {
         return athleteContext;
     }
 
-    public void setAthleteContext(AthleteContext athleteContext) {
+    public void setAthleteContext(String athleteContext) {
         this.athleteContext = athleteContext;
     }
 

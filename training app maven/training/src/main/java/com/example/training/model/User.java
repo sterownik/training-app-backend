@@ -27,6 +27,17 @@ public class User {
     @Column(length = 2000)
     private String stravaAccessToken;
 
+    public String getAthleteInfo() {
+        return athleteInfo;
+    }
+
+    public void setAthleteInfo(String athleteInfo) {
+        this.athleteInfo = athleteInfo;
+    }
+
+    @Column(length = 2000)
+    private String athleteInfo;
+
     @Column(length = 2000)
     private String stravaRefreshToken;
 

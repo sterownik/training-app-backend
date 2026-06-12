@@ -29,15 +29,14 @@ public class UserController {
         return findedUser;
     }
 
-    @GetMapping("/is-user-info")
-    public Boolean isUserInfo(
+    @GetMapping("/athlete-info")
+    public Optional<String> athleteInfo(
             Authentication auth
     ) throws IOException {
         User user = (User) auth.getPrincipal();
-        Boolean isInfo = userRepository.findById(user.getId())
-                .map(User::getAthleteInfo)
-                .isPresent();
-        return isInfo;
+        Optional<String> info = userRepository.findById(user.getId())
+                .map(User::getAthleteInfo);
+        return info;
     }
 
 

@@ -33,7 +33,7 @@ public class StravaActivityService {
 
     public void updateLaps(String accessToken, User user) throws InterruptedException {
         List<Activity> activities = activityRepository
-                .findFirst60ByUserIdOrderByStartDateLocalDesc(user.getId());;
+                .findFirst20ByUserIdOrderByStartDateLocalDesc(user.getId());;
 
         for (Activity activity : activities) {
 
@@ -129,7 +129,7 @@ public class StravaActivityService {
                 .map(d -> d.toInstant().getEpochSecond())
                 .orElseGet(() ->
                         Instant.now()
-                                .minus(734, ChronoUnit.DAYS)
+                                .minus(200, ChronoUnit.DAYS)
                                 .getEpochSecond()
                 );
 

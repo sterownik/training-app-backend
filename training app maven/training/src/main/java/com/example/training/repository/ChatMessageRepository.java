@@ -13,7 +13,7 @@ public interface ChatMessageRepository
         extends JpaRepository<ChatMessage, Long> {
 
     List<ChatMessage>
-    findTop10ByIdChatOrderByCreatedAtDesc(UUID idChat);
+    findTop5ByIdChatOrderByCreatedAtDesc(UUID idChat);
 
 
     @Query("""

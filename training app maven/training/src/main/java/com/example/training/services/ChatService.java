@@ -39,7 +39,7 @@ public class ChatService {
 
         // pobranie kontekstu
         List<ChatMessage> context =
-                repository.findTop10ByIdChatOrderByCreatedAtDesc(
+                repository.findTop5ByIdChatOrderByCreatedAtDesc(
                         idChat
                 );
 

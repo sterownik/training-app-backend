@@ -31,30 +31,46 @@ public class StravaActivityService {
         this.openAiService = openAiService;
     }
 
-    public void updateLaps(String accessToken, User user) throws InterruptedException {
+    // Szczegoly aktywnosci zwracaja jednoczesnie okrazenia i zdjecia, wiec jedno zapytanie na aktywnosc
+    public void updateDetails(String accessToken, User user) throws InterruptedException {
         List<Activity> activities = activityRepository
-                .findFirst20ByUserIdOrderByStartDateLocalDesc(user.getId());;
+                .findFirst20ByUserIdOrderByStartDateLocalDesc(user.getId());
 
         for (Activity activity : activities) {
+            boolean needsLaps = activity.getLaps() == null
+                    && (activity.getType().contains("Ride") || activity.getType().contains("Run"));
+            boolean needsPhoto = activity.getPhotoUrl() == null
+                    && activity.getPhotoCount() != null && activity.getPhotoCount() > 0;
 
-
-            if(activity.getLaps() == null && (activity.getType().contains("Ride") || activity.getType().contains("Run"))) {
+            if (needsLaps || needsPhoto) {
                 try {
-                    String url = "https://www.strava.com/api/v3/activities/" + activity.getStravaActivityId() + "/laps";
+                    String url = "https://www.strava.com/api/v3/activities/" + activity.getStravaActivityId();
 
                     HttpHeaders headers = new HttpHeaders();
                     headers.setBearerAuth(accessToken);
 
                     HttpEntity<String> entity = new HttpEntity<>(headers);
 
-                    ResponseEntity<StravaLapDto[]> response = restTemplate.exchange(
+                    ResponseEntity<StravaActivity> response = restTemplate.exchange(
                             url,
                             HttpMethod.GET,
                             entity,
-                            StravaLapDto[].class
+                            StravaActivity.class
                     );
 
-                    StravaLapDto[] lapsStrava = response.getBody();
+                    StravaActivity details = response.getBody();
+                    if (details == null) {
+                        continue;
+                    }
+
+                    boolean changed = false;
+                    String photoUrl = primaryPhotoUrl(details);
+                    if (photoUrl != null) {
+                        activity.setPhotoUrl(photoUrl);
+                        changed = true;
+                    }
+
+                    StravaLapDto[] lapsStrava = details.getLaps();
                     StringBuilder descriptionBuilder = new StringBuilder();
 
                     if (lapsStrava != null && lapsStrava.length > 0) {
@@ -101,9 +117,12 @@ public class StravaActivityService {
                     }
                     if (!descriptionBuilder.toString().isEmpty()) {
                         activity.setLaps(descriptionBuilder.toString());
-                        activityRepository.save(activity);
-                        Thread.sleep(100);
+                        changed = true;
                     }
+                    if (changed) {
+                        activityRepository.save(activity);
+                    }
+                    Thread.sleep(100);
                 }catch (HttpClientErrorException.TooManyRequests e) {
                     // Jeśli dostaniesz 429, przerwij pętlę i spróbuj przy następnym uruchomieniu
                     System.err.println("Przekroczono limit Stravy (429). Przerywam sesję.");
@@ -124,9 +143,16 @@ public class StravaActivityService {
                         .map(Activity::getStartDateLocal);
 
 //
+        Optional<OffsetDateTime> oldestWithoutMap =
+                activityRepository
+                        .findFirstByUserIdAndSummaryPolylineIsNullOrderByStartDateLocalAsc(user.getId())
+                        .map(Activity::getStartDateLocal);
+
         long before = Instant.now().getEpochSecond();
-        long after = latest
-                .map(d -> d.toInstant().getEpochSecond())
+        // start_date_local to czas lokalny zapisany jako UTC, zapas 1 dnia zeby nie pominac aktywnosci
+        long after = oldestWithoutMap
+                .map(d -> d.toInstant().getEpochSecond() - 86400)
+                .or(() -> latest.map(d -> d.toInstant().getEpochSecond()))
                 .orElseGet(() ->
                         Instant.now()
                                 .minus(200, ChronoUnit.DAYS)
@@ -167,7 +193,14 @@ public class StravaActivityService {
             }
 
             for (StravaActivity a : activities) {
-                if(activityRepository.existsByStravaActivityId(a.getId())) {
+                Optional<Activity> existing = activityRepository.findByStravaActivityId(a.getId());
+                if (existing.isPresent()) {
+                    Activity existingActivity = existing.get();
+                    if (existingActivity.getSummaryPolyline() == null) {
+                        existingActivity.setSummaryPolyline(summaryPolylineOf(a));
+                        existingActivity.setPhotoCount(a.getTotalPhotoCount());
+                        result.add(existingActivity);
+                    }
                     continue;
                 }
                 Double averageSpeed;
@@ -203,10 +236,9 @@ public class StravaActivityService {
                 activityDto.setMaxSpeed(maxSpeed);
                 activityDto.setStravaActivityId(a.getId());
                 activityDto.setStartDateLocal(a.getStartDateLocal());
-                System.out.println(a.getPhotos());
-                if(a.getPhotos() != null && a.getPhotos().getPrimary().getUrls() != null && a.getPhotos().getPrimary().getUrls().get("600") != null ) {
-                    activityDto.setPhotoUrl(a.getPhotos().getPrimary().getUrls().get("600"));
-                }
+                activityDto.setPhotoUrl(primaryPhotoUrl(a));
+                activityDto.setPhotoCount(a.getTotalPhotoCount());
+                activityDto.setSummaryPolyline(summaryPolylineOf(a));
 
                 activityDto.setDescription(a.getName());
 
@@ -218,6 +250,26 @@ public class StravaActivityService {
             page++;
         }
         activityRepository.saveAll(result);
+
+        // Aktywnosci, ktorych Strava juz nie zwraca (np. usuniete) - oznacz, zeby nie pobierac ich w kolko
+        List<Activity> stillWithoutMap = activityRepository.findByUserIdAndSummaryPolylineIsNull(user.getId());
+        stillWithoutMap.forEach(activity -> activity.setSummaryPolyline(""));
+        activityRepository.saveAll(stillWithoutMap);
+    }
+
+    private static String summaryPolylineOf(StravaActivity a) {
+        if (a.getMap() == null || a.getMap().getSummaryPolyline() == null) {
+            return "";
+        }
+        return a.getMap().getSummaryPolyline();
+    }
+
+    private static String primaryPhotoUrl(StravaActivity a) {
+        if (a.getPhotos() == null || a.getPhotos().getPrimary() == null
+                || a.getPhotos().getPrimary().getUrls() == null) {
+            return null;
+        }
+        return a.getPhotos().getPrimary().getUrls().get("600");
     }
 
 

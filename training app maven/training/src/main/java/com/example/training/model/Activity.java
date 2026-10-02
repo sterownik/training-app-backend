@@ -58,6 +58,12 @@ public class Activity
      @Column(length = 2000)
      private String photoUrl;
 
+     // pusty string = aktywnosc bez GPS (zeby nie pobierac jej ponownie)
+     @Column(columnDefinition = "TEXT")
+     private String summaryPolyline;
+
+     private Integer photoCount;
+
      @Column(length = 2000)
      private Double averageWatts;
 

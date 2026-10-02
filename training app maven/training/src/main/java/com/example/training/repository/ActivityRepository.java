@@ -23,6 +23,13 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     boolean existsByStravaActivityId(Long stravaActivityId);
 
+    Optional<Activity> findByStravaActivityId(Long stravaActivityId);
+
+    // najstarsza aktywnosc bez pobranej trasy - od niej zaczynamy uzupelnianie map
+    Optional<Activity> findFirstByUserIdAndSummaryPolylineIsNullOrderByStartDateLocalAsc(Long userId);
+
+    List<Activity> findByUserIdAndSummaryPolylineIsNull(Long userId);
+
     List<Activity> findByUserIdAndTypeOrderByStartDateLocalDesc(
             Long userId,
             String type,

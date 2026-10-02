@@ -18,7 +18,8 @@ public record ActivityDto(
         String pace,
         String descriptionTyped,
         Double normalizedPower,
-        String laps
+        String laps,
+        String summaryPolyline
 ) {
     public static ActivityDto from(Activity a) {
         String pace;
@@ -56,7 +57,8 @@ public record ActivityDto(
                 pace,
                 a.getDescriptionTyped(),
                 a.getNormalizedPower(),
-                a.getLaps()
+                a.getLaps(),
+                a.getSummaryPolyline() == null || a.getSummaryPolyline().isEmpty() ? null : a.getSummaryPolyline()
         );
     }
 

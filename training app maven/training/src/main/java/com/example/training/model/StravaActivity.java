@@ -30,6 +30,32 @@ public class StravaActivity {
 
     private Photos photos;
 
+    private ActivityMap map;
+
+    @JsonProperty("total_photo_count")
+    private Integer totalPhotoCount;
+
+    // tylko w szczegolach aktywnosci (/activities/{id})
+    private StravaLapDto[] laps;
+
+    public ActivityMap getMap() { return map; }
+    public void setMap(ActivityMap map) { this.map = map; }
+
+    public Integer getTotalPhotoCount() { return totalPhotoCount; }
+    public void setTotalPhotoCount(Integer totalPhotoCount) { this.totalPhotoCount = totalPhotoCount; }
+
+    public StravaLapDto[] getLaps() { return laps; }
+    public void setLaps(StravaLapDto[] laps) { this.laps = laps; }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ActivityMap {
+        @JsonProperty("summary_polyline")
+        private String summaryPolyline; // zakodowana trasa (Google encoded polyline)
+
+        public String getSummaryPolyline() { return summaryPolyline; }
+        public void setSummaryPolyline(String summaryPolyline) { this.summaryPolyline = summaryPolyline; }
+    }
+
     public Double getAverage_watts() {
         return average_watts;
     }

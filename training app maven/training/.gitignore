@@ -35,3 +35,6 @@ build/
 ### Secrets ###
 src/main/resources/secrets.properties
 .env
+
+### Frontend (budowany w Dockerfile z repo training-app-frontend) ###
+src/main/resources/static/

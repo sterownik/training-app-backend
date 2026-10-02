@@ -20,6 +20,9 @@ public class StravaAuthController {
     @Value("${logging.api.callback}")
     private String loggingApiCallback;
 
+    @Value("${strava.client-id}")
+    private String stravaClientId;
+
     private final UserRepository userRepository;
     private final StravaAuthService stravaAuthService;
     private final JwtService jwtService;
@@ -39,7 +42,7 @@ public class StravaAuthController {
 
         String url =
                 "https://www.strava.com/oauth/authorize" +
-                        "?client_id=191684" +
+                        "?client_id=" + this.stravaClientId +
                         "&response_type=code" +
                         "&redirect_uri=" + this.loggingApiCallback + "/auth/strava/callback" +
                         "&scope=activity:read_all";

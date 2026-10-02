@@ -16,11 +16,11 @@ public class StravaAuthService {
 
     private static final String TOKEN_URL = "https://www.strava.com/oauth/token";
 
-//    @Value("${strava.client-id}")
-    private final String clientId = "191684";
+    @Value("${strava.client-id}")
+    private String clientId;
 
-//    @Value("${strava.client-secret}")
-    private final String clientSecret = "0fdf942eed9b82efe708a31fe89c2e0bb96573f2";
+    @Value("${strava.client-secret}")
+    private String clientSecret;
 
     private final RestClient restClient = RestClient.create();
 

@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,12 +24,9 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
 
     boolean existsByStravaActivityId(Long stravaActivityId);
 
-    Optional<Activity> findByStravaActivityId(Long stravaActivityId);
+    List<Activity> findByStravaActivityIdIn(Collection<Long> stravaActivityIds);
 
-    // najstarsza aktywnosc bez pobranej trasy - od niej zaczynamy uzupelnianie map
-    Optional<Activity> findFirstByUserIdAndSummaryPolylineIsNullOrderByStartDateLocalAsc(Long userId);
-
-    List<Activity> findByUserIdAndSummaryPolylineIsNull(Long userId);
+    List<Activity> findFirst50ByUserIdOrderByStartDateLocalDesc(Long userId);
 
     List<Activity> findByUserIdAndTypeOrderByStartDateLocalDesc(
             Long userId,

@@ -143,10 +143,12 @@ public class StravaActivityService {
                         .map(Activity::getStartDateLocal);
 
 //
-        Optional<OffsetDateTime> oldestWithoutMap =
-                activityRepository
-                        .findFirstByUserIdAndSummaryPolylineIsNullOrderByStartDateLocalAsc(user.getId())
-                        .map(Activity::getStartDateLocal);
+        // Trasy uzupelniamy tylko dla najnowszych aktywnosci, zeby synchronizacja byla szybka
+        List<Activity> newest = activityRepository.findFirst50ByUserIdOrderByStartDateLocalDesc(user.getId());
+        Optional<OffsetDateTime> oldestWithoutMap = newest.stream()
+                .filter(activity -> activity.getSummaryPolyline() == null)
+                .map(Activity::getStartDateLocal)
+                .min(Comparator.naturalOrder());
 
         long before = Instant.now().getEpochSecond();
         // start_date_local to czas lokalny zapisany jako UTC, zapas 1 dnia zeby nie pominac aktywnosci
@@ -160,6 +162,8 @@ public class StravaActivityService {
                 );
 
         List<Activity> result = new ArrayList<>();
+        Set<Long> updatedStravaIds = new HashSet<>();
+        boolean completed = true;
 
         int page = 1;
         while (true) {
@@ -178,13 +182,20 @@ public class StravaActivityService {
 
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-            ResponseEntity<StravaActivity[]> response =
-                    restTemplate.exchange(
-                            url,
-                            HttpMethod.GET,
-                            entity,
-                            StravaActivity[].class
-                    );
+            ResponseEntity<StravaActivity[]> response;
+            try {
+                response = restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        entity,
+                        StravaActivity[].class
+                );
+            } catch (HttpClientErrorException.TooManyRequests e) {
+                // limit Stravy - zapisz to, co juz pobrane, reszta przy nastepnej synchronizacji
+                System.err.println("Przekroczono limit Stravy (429) przy pobieraniu listy aktywności.");
+                completed = false;
+                break;
+            }
 
             StravaActivity[] activities = response.getBody();
 
@@ -192,14 +203,20 @@ public class StravaActivityService {
                 break;
             }
 
+            // jedno zapytanie do bazy na strone zamiast jednego na aktywnosc
+            List<Long> stravaIds = Arrays.stream(activities).map(StravaActivity::getId).toList();
+            Map<Long, Activity> existingByStravaId = new HashMap<>();
+            activityRepository.findByStravaActivityIdIn(stravaIds)
+                    .forEach(activity -> existingByStravaId.put(activity.getStravaActivityId(), activity));
+
             for (StravaActivity a : activities) {
-                Optional<Activity> existing = activityRepository.findByStravaActivityId(a.getId());
-                if (existing.isPresent()) {
-                    Activity existingActivity = existing.get();
+                Activity existingActivity = existingByStravaId.get(a.getId());
+                if (existingActivity != null) {
                     if (existingActivity.getSummaryPolyline() == null) {
                         existingActivity.setSummaryPolyline(summaryPolylineOf(a));
                         existingActivity.setPhotoCount(a.getTotalPhotoCount());
                         result.add(existingActivity);
+                        updatedStravaIds.add(a.getId());
                     }
                     continue;
                 }
@@ -251,10 +268,15 @@ public class StravaActivityService {
         }
         activityRepository.saveAll(result);
 
-        // Aktywnosci, ktorych Strava juz nie zwraca (np. usuniete) - oznacz, zeby nie pobierac ich w kolko
-        List<Activity> stillWithoutMap = activityRepository.findByUserIdAndSummaryPolylineIsNull(user.getId());
-        stillWithoutMap.forEach(activity -> activity.setSummaryPolyline(""));
-        activityRepository.saveAll(stillWithoutMap);
+        if (completed) {
+            // Aktywnosci, ktorych Strava juz nie zwraca (np. usuniete) - oznacz, zeby nie pobierac ich w kolko
+            List<Activity> stillWithoutMap = newest.stream()
+                    .filter(activity -> activity.getSummaryPolyline() == null)
+                    .filter(activity -> !updatedStravaIds.contains(activity.getStravaActivityId()))
+                    .toList();
+            stillWithoutMap.forEach(activity -> activity.setSummaryPolyline(""));
+            activityRepository.saveAll(stillWithoutMap);
+        }
     }
 
     private static String summaryPolylineOf(StravaActivity a) {

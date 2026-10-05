@@ -119,6 +119,17 @@ public class StravaActivityService {
                         activity.setLaps(descriptionBuilder.toString());
                         changed = true;
                     }
+
+                    // Opis interwalow tylko przy pierwszym pobraniu okrazen i gdy uzytkownik nie ma wlasnego opisu
+                    boolean hasOwnDescription = activity.getDescriptionTyped() != null
+                            && !activity.getDescriptionTyped().isBlank();
+                    if (needsLaps && !hasOwnDescription) {
+                        String intervals = describeIntervals(lapsStrava);
+                        if (intervals != null) {
+                            activity.setDescriptionTyped(intervals);
+                            changed = true;
+                        }
+                    }
                     if (changed) {
                         activityRepository.save(activity);
                     }
@@ -277,6 +288,76 @@ public class StravaActivityService {
             stillWithoutMap.forEach(activity -> activity.setSummaryPolyline(""));
             activityRepository.saveAll(stillWithoutMap);
         }
+    }
+
+    // Okrazenie ze srednia moca powyzej tego progu traktujemy jako interwal
+    static final int INTERVAL_POWER_THRESHOLD_WATTS = 220;
+
+    /**
+     * Np. "10 min interwał 240 W, tętno 165 bpm; 5 min przerwy; 10 min interwał 245 W, tętno 170 bpm".
+     * Zwraca null, gdy zadne okrazenie nie przekracza progu mocy.
+     */
+    static String describeIntervals(StravaLapDto[] laps) {
+        if (laps == null) {
+            return null;
+        }
+
+        List<String> parts = new ArrayList<>();
+        int restSeconds = 0;
+        boolean afterInterval = false;
+
+        for (StravaLapDto lap : laps) {
+            boolean isInterval = lap.getAverageWatts() != null
+                    && lap.getAverageWatts() > INTERVAL_POWER_THRESHOLD_WATTS;
+
+            if (!isInterval) {
+                // przerwe liczymy tylko miedzy interwalami (bez rozgrzewki i schlodzenia)
+                if (afterInterval) {
+                    restSeconds += lapSeconds(lap.getElapsedTime(), lap.getMovingTime());
+                }
+                continue;
+            }
+
+            if (afterInterval && restSeconds > 0) {
+                parts.add(formatDuration(restSeconds) + " przerwy");
+            }
+            restSeconds = 0;
+            afterInterval = true;
+
+            StringBuilder interval = new StringBuilder()
+                    .append(formatDuration(lapSeconds(lap.getMovingTime(), lap.getElapsedTime())))
+                    .append(" interwał ")
+                    .append(lap.getAverageWatts())
+                    .append(" W");
+            if (lap.getAverageHeartrate() != null) {
+                interval.append(", tętno ").append(Math.round(lap.getAverageHeartrate())).append(" bpm");
+            }
+            parts.add(interval.toString());
+        }
+
+        if (parts.isEmpty()) {
+            return null;
+        }
+        String description = String.join("; ", parts);
+        return description.length() > 2000 ? description.substring(0, 2000) : description;
+    }
+
+    private static int lapSeconds(Integer preferred, Integer fallback) {
+        if (preferred != null) {
+            return preferred;
+        }
+        return fallback != null ? fallback : 0;
+    }
+
+    // ponizej minuty dokladnie, powyzej zaokraglone do 10 s: "45 s", "10 min", "4 min 30 s"
+    static String formatDuration(int seconds) {
+        if (seconds < 60) {
+            return seconds + " s";
+        }
+        int rounded = (int) Math.round(seconds / 10.0) * 10;
+        int minutes = rounded / 60;
+        int rest = rounded % 60;
+        return rest == 0 ? minutes + " min" : minutes + " min " + rest + " s";
     }
 
     private static String summaryPolylineOf(StravaActivity a) {

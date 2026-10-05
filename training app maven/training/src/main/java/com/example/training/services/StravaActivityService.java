@@ -307,6 +307,8 @@ public class StravaActivityService {
         IntervalBlock block = null;
         int restSeconds = 0;
         boolean afterInterval = false;
+        double metersBefore = 0;
+        double metersSinceLastInterval = 0;
 
         for (StravaLapDto lap : laps) {
             boolean isInterval = lap.getAverageWatts() != null
@@ -317,9 +319,13 @@ public class StravaActivityService {
                     parts.add(block.describe());
                     block = null;
                 }
+                double lapMeters = lap.getDistance() != null ? lap.getDistance() : 0;
                 // przerwe liczymy tylko miedzy interwalami (bez rozgrzewki i schlodzenia)
                 if (afterInterval) {
                     restSeconds += lapSeconds(lap.getElapsedTime(), lap.getMovingTime());
+                    metersSinceLastInterval += lapMeters;
+                } else {
+                    metersBefore += lapMeters;
                 }
                 continue;
             }
@@ -329,6 +335,7 @@ public class StravaActivityService {
                     parts.add(formatDuration(restSeconds) + " przerwy");
                 }
                 restSeconds = 0;
+                metersSinceLastInterval = 0;
                 afterInterval = true;
                 block = new IntervalBlock();
             }
@@ -340,6 +347,13 @@ public class StravaActivityService {
 
         if (parts.isEmpty()) {
             return null;
+        }
+        if (metersBefore > 0) {
+            parts.addFirst(formatKilometers(metersBefore) + " przed interwałami");
+        }
+        // okrazenia po ostatnim interwale to schlodzenie
+        if (metersSinceLastInterval > 0) {
+            parts.add(formatKilometers(metersSinceLastInterval) + " po interwałach");
         }
         String description = String.join("; ", parts);
         return description.length() > 2000 ? description.substring(0, 2000) : description;
@@ -373,6 +387,11 @@ public class StravaActivityService {
             }
             return interval.toString();
         }
+    }
+
+    // "12,3 km"
+    static String formatKilometers(double meters) {
+        return String.format(Locale.forLanguageTag("pl-PL"), "%.1f km", meters / 1000.0);
     }
 
     private static int lapSeconds(Integer preferred, Integer fallback) {

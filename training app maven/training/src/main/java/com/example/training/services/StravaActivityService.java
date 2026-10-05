@@ -307,7 +307,7 @@ public class StravaActivityService {
         IntervalBlock block = null;
         int restSeconds = 0;
         boolean afterInterval = false;
-        double metersBefore = 0;
+        LapStats beforeIntervals = new LapStats();
         double metersSinceLastInterval = 0;
 
         for (StravaLapDto lap : laps) {
@@ -325,7 +325,7 @@ public class StravaActivityService {
                     restSeconds += lapSeconds(lap.getElapsedTime(), lap.getMovingTime());
                     metersSinceLastInterval += lapMeters;
                 } else {
-                    metersBefore += lapMeters;
+                    beforeIntervals.add(lap);
                 }
                 continue;
             }
@@ -348,44 +348,79 @@ public class StravaActivityService {
         if (parts.isEmpty()) {
             return null;
         }
-        if (metersBefore > 0) {
-            parts.addFirst(formatKilometers(metersBefore) + " przed interwałami");
+        String warmup = beforeIntervals.describeWarmup();
+        if (warmup != null) {
+            parts.addFirst("przed interwałami: " + warmup);
         }
         // okrazenia po ostatnim interwale to schlodzenie
         if (metersSinceLastInterval > 0) {
-            parts.add(formatKilometers(metersSinceLastInterval) + " po interwałach");
+            parts.add("po interwałach: " + formatKilometers(metersSinceLastInterval));
         }
         String description = String.join("; ", parts);
         return description.length() > 2000 ? description.substring(0, 2000) : description;
     }
 
     // kolejne okrazenia powyzej progu mocy zlaczone w jeden interwal
-    private static class IntervalBlock {
-        private int seconds;
-        private double wattSeconds;
+    private static class IntervalBlock extends LapStats {
+        String describe() {
+            StringBuilder interval = new StringBuilder()
+                    .append(formatDuration(seconds))
+                    .append(" interwał ")
+                    .append(averageWatts())
+                    .append(" W");
+            if (averageHeartRate() != null) {
+                interval.append(", tętno ").append(averageHeartRate()).append(" bpm");
+            }
+            return interval.toString();
+        }
+    }
+
+    // suma czasu i dystansu oraz srednia moc i tetno wazone czasem okrazen
+    private static class LapStats {
+        int seconds;
+        double meters;
+        private int wattSeconds;
+        private double wattWeighted;
         private int heartRateSeconds;
         private double heartRateWeighted;
 
         void add(StravaLapDto lap) {
             int lapSeconds = lapSeconds(lap.getMovingTime(), lap.getElapsedTime());
             seconds += lapSeconds;
-            wattSeconds += lap.getAverageWatts() * (double) lapSeconds;
+            if (lap.getDistance() != null) {
+                meters += lap.getDistance();
+            }
+            if (lap.getAverageWatts() != null) {
+                wattSeconds += lapSeconds;
+                wattWeighted += lap.getAverageWatts() * (double) lapSeconds;
+            }
             if (lap.getAverageHeartrate() != null) {
                 heartRateSeconds += lapSeconds;
                 heartRateWeighted += lap.getAverageHeartrate() * lapSeconds;
             }
         }
 
-        String describe() {
-            StringBuilder interval = new StringBuilder()
-                    .append(formatDuration(seconds))
-                    .append(" interwał ")
-                    .append(seconds > 0 ? Math.round(wattSeconds / seconds) : 0)
-                    .append(" W");
-            if (heartRateSeconds > 0) {
-                interval.append(", tętno ").append(Math.round(heartRateWeighted / heartRateSeconds)).append(" bpm");
+        Long averageWatts() {
+            return wattSeconds > 0 ? Math.round(wattWeighted / wattSeconds) : null;
+        }
+
+        Long averageHeartRate() {
+            return heartRateSeconds > 0 ? Math.round(heartRateWeighted / heartRateSeconds) : null;
+        }
+
+        // "12,3 km, śr. 150 W, śr. tętno 125 bpm" albo null, gdy brak danych
+        String describeWarmup() {
+            List<String> values = new ArrayList<>();
+            if (meters > 0) {
+                values.add(formatKilometers(meters));
             }
-            return interval.toString();
+            if (averageWatts() != null) {
+                values.add("śr. " + averageWatts() + " W");
+            }
+            if (averageHeartRate() != null) {
+                values.add("śr. tętno " + averageHeartRate() + " bpm");
+            }
+            return values.isEmpty() ? null : String.join(", ", values);
         }
     }
 

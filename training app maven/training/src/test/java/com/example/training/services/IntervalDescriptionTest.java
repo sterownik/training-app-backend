@@ -34,7 +34,8 @@ class IntervalDescriptionTest {
         };
 
         assertEquals(
-                "10 min interwał 240 W, tętno 165 bpm; 5 min przerwy; 10 min interwał 245 W, tętno 170 bpm",
+                "przed interwałami: śr. 150 W, śr. tętno 120 bpm; "
+                        + "10 min interwał 240 W, tętno 165 bpm; 5 min przerwy; 10 min interwał 245 W, tętno 170 bpm",
                 StravaActivityService.describeIntervals(laps));
     }
 
@@ -78,8 +79,10 @@ class IntervalDescriptionTest {
                 lap(900, 130, 120.0, 8050.0),   // po: 8,1 km
         };
 
-        assertEquals("12,3 km przed interwałami; 10 min interwał 250 W, tętno 165 bpm; 5 min przerwy; "
-                        + "10 min interwał 255 W, tętno 168 bpm; 8,1 km po interwałach",
+        // przed: 1200 s po 150 W i 120 bpm + 900 s po 160 W i 125 bpm -> 154 W, 122 bpm
+        assertEquals("przed interwałami: 12,3 km, śr. 154 W, śr. tętno 122 bpm; "
+                        + "10 min interwał 250 W, tętno 165 bpm; 5 min przerwy; "
+                        + "10 min interwał 255 W, tętno 168 bpm; po interwałach: 8,1 km",
                 StravaActivityService.describeIntervals(laps));
     }
 }

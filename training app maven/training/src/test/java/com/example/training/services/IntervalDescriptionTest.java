@@ -41,10 +41,24 @@ class IntervalDescriptionTest {
     }
 
     @Test
-    void handlesMissingHeartRateAndBackToBackIntervals() {
-        StravaLapDto[] laps = {lap(270, 300, null), lap(45, 320, null)};
+    void mergesConsecutiveLapsAboveThreshold() {
+        StravaLapDto[] laps = {
+                lap(300, 240, 160.0),
+                lap(300, 260, 170.0),   // razem: 10 min, 250 W, 165 bpm
+                lap(240, 120, 130.0),
+                lap(120, 300, null),
+                lap(60, 330, 175.0),    // razem: 3 min, 310 W, tetno tylko z okrazenia z czujnikiem
+        };
 
-        assertEquals("4 min 30 s interwał 300 W; 45 s interwał 320 W",
+        assertEquals("10 min interwał 250 W, tętno 165 bpm; 4 min przerwy; 3 min interwał 310 W, tętno 175 bpm",
+                StravaActivityService.describeIntervals(laps));
+    }
+
+    @Test
+    void handlesMissingHeartRate() {
+        StravaLapDto[] laps = {lap(270, 300, null), lap(60, 100, null), lap(45, 320, null)};
+
+        assertEquals("4 min 30 s interwał 300 W; 1 min przerwy; 45 s interwał 320 W",
                 StravaActivityService.describeIntervals(laps));
     }
 }

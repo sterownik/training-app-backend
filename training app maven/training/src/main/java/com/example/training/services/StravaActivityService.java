@@ -295,6 +295,7 @@ public class StravaActivityService {
 
     /**
      * Np. "10 min interwał 240 W, tętno 165 bpm; 5 min przerwy; 10 min interwał 245 W, tętno 170 bpm".
+     * Kolejne okrazenia powyzej progu sa laczone w jeden interwal (moc i tetno srednio wazone czasem).
      * Zwraca null, gdy zadne okrazenie nie przekracza progu mocy.
      */
     static String describeIntervals(StravaLapDto[] laps) {
@@ -303,6 +304,7 @@ public class StravaActivityService {
         }
 
         List<String> parts = new ArrayList<>();
+        IntervalBlock block = null;
         int restSeconds = 0;
         boolean afterInterval = false;
 
@@ -311,6 +313,10 @@ public class StravaActivityService {
                     && lap.getAverageWatts() > INTERVAL_POWER_THRESHOLD_WATTS;
 
             if (!isInterval) {
+                if (block != null) {
+                    parts.add(block.describe());
+                    block = null;
+                }
                 // przerwe liczymy tylko miedzy interwalami (bez rozgrzewki i schlodzenia)
                 if (afterInterval) {
                     restSeconds += lapSeconds(lap.getElapsedTime(), lap.getMovingTime());
@@ -318,21 +324,18 @@ public class StravaActivityService {
                 continue;
             }
 
-            if (afterInterval && restSeconds > 0) {
-                parts.add(formatDuration(restSeconds) + " przerwy");
+            if (block == null) {
+                if (afterInterval && restSeconds > 0) {
+                    parts.add(formatDuration(restSeconds) + " przerwy");
+                }
+                restSeconds = 0;
+                afterInterval = true;
+                block = new IntervalBlock();
             }
-            restSeconds = 0;
-            afterInterval = true;
-
-            StringBuilder interval = new StringBuilder()
-                    .append(formatDuration(lapSeconds(lap.getMovingTime(), lap.getElapsedTime())))
-                    .append(" interwał ")
-                    .append(lap.getAverageWatts())
-                    .append(" W");
-            if (lap.getAverageHeartrate() != null) {
-                interval.append(", tętno ").append(Math.round(lap.getAverageHeartrate())).append(" bpm");
-            }
-            parts.add(interval.toString());
+            block.add(lap);
+        }
+        if (block != null) {
+            parts.add(block.describe());
         }
 
         if (parts.isEmpty()) {
@@ -340,6 +343,36 @@ public class StravaActivityService {
         }
         String description = String.join("; ", parts);
         return description.length() > 2000 ? description.substring(0, 2000) : description;
+    }
+
+    // kolejne okrazenia powyzej progu mocy zlaczone w jeden interwal
+    private static class IntervalBlock {
+        private int seconds;
+        private double wattSeconds;
+        private int heartRateSeconds;
+        private double heartRateWeighted;
+
+        void add(StravaLapDto lap) {
+            int lapSeconds = lapSeconds(lap.getMovingTime(), lap.getElapsedTime());
+            seconds += lapSeconds;
+            wattSeconds += lap.getAverageWatts() * (double) lapSeconds;
+            if (lap.getAverageHeartrate() != null) {
+                heartRateSeconds += lapSeconds;
+                heartRateWeighted += lap.getAverageHeartrate() * lapSeconds;
+            }
+        }
+
+        String describe() {
+            StringBuilder interval = new StringBuilder()
+                    .append(formatDuration(seconds))
+                    .append(" interwał ")
+                    .append(seconds > 0 ? Math.round(wattSeconds / seconds) : 0)
+                    .append(" W");
+            if (heartRateSeconds > 0) {
+                interval.append(", tętno ").append(Math.round(heartRateWeighted / heartRateSeconds)).append(" bpm");
+            }
+            return interval.toString();
+        }
     }
 
     private static int lapSeconds(Integer preferred, Integer fallback) {
